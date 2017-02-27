@@ -1,0 +1,103 @@
+.bhulogo {
+    width: 70%;
+    margin-top: 9%;
+}
+
+.panel-divider { border-right: 1px solid #D3E0E9; }
+
+.bhu-main-txt, .bhu-slug-txt {
+    display: block;
+}
+
+.bhu-main-txt {
+    font-size: 3.3em;
+    margin-left: 10%;
+}
+
+.bhu-slug-txt {
+    font-size: 2em;
+    margin-left: 12%;
+}
+
+.bhu-txt-margin {
+    /*margin-top: 2%;*/
+}
+
+.passport-img { width: 100%; }
+
+.panel-custom-bg > .panel-heading {
+    background-image: none;
+    background-color: #E3E3E3;
+}
+
+.panel-custom-bg .table { margin-bottom: 0; }
+
+.signature-date {
+    padding-top: 5%;
+    border-top: 1px solid #444;
+}
+
+.panel .panel-xs-padding {
+    padding: 10% 3% 3% 3%;
+}
+
+.panel .panel-xs-padding-2 {
+    padding: 16% 1% 3% 1%;
+}
+
+.panel-custom > .panel-heading, .panel-body {
+    padding: 2px 15px;
+}
+
+.remove-panel-border {
+    border: 0;
+    box-shadow: none;
+}
+
+.row-margin-top {
+    margin-top: 1%;
+}
+
+/*.alert-print {*/
+    /*color: red;*/
+    /*padding: 15px;*/
+    /*margin-bottom: 22px;*/
+    /*border: 1px solid transparent;*/
+    /*border-radius: 4px;*/
+    /*background-color: #E3E3E3;*/
+    /*!*border-color: #333 !important;*!*/
+    /*color: #000;*/
+/*}*/
+
+@media print {
+
+    body {
+        color: #000 !important;
+        font-size: 1.8em;
+    }
+
+    .panel-custom-bg > .panel-heading {
+        background-image: none !important;
+        background-color: #E3E3E3 !important;
+    }
+
+    .panel-custom-bg > .panel-footer {
+        background-color: #E3E3E3 !important;
+    }
+
+    .bhu-main-txt {
+        font-size: 2em;
+        margin-left: 20%;
+    }
+
+    .bhu-slug-txt {
+        font-size: 1.3em;
+        margin-left: 20%;
+    }
+
+    .alert-danger {
+        background-color: #E3E3E3 !important;
+        border-color: #E3E3E3 !important;
+        color: #000 !important;
+    }
+}
