@@ -9,7 +9,6 @@
         "laravel/framework": "5.1.*",
         "barryvdh/laravel-ide-helper": "^2.2",
 	"laravelcollective/html": "5.1.*",
-        "genealabs/laravel-caffeine": "^0.4.2",
 	"maatwebsite/excel": "~2.1.0",
         "tecnick.com/tcpdf": "~6.0.0"
 

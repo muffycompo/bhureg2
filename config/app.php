@@ -148,7 +148,6 @@ return [
         // Third Party Service Providers
         Collective\Html\HtmlServiceProvider::class,
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
-        GeneaLabs\LaravelCaffeine\Providers\LaravelCaffeineService::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
     ],
