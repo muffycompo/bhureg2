@@ -156,8 +156,16 @@ function changeStringToUpperCase($string){
     return strtoupper(strtolower($string));
 }
 
+function prepareAppUrl(){
+    return env('APP_URL','http://binghamuni.edu.ng');
+}
+
 function preparePassportImgPath($dbPath){
-    return env('APP_URL','http://binghamuni.edu.ng') . str_replace('..','',$dbPath);
+    if(!empty($dbPath)){
+        return 'http://binghamuni.edu.ng' . str_replace('..','',$dbPath);
+    } else {
+        return prepareAppUrl() . '/images/passport_placeholder.png';
+    }
 }
 
 function encryptId($id){

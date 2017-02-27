@@ -14,7 +14,7 @@
                         <div class="row">
                             <div class="col-md-2 col-xs-2 panel-divider">
                                 <p class="text-center">
-                                    <img class="bhulogo" src="/images/bhu-logo.png" alt="Logo">
+                                    <img class="bhulogo" src="{{ prepareAppUrl() }}/images/bhu-logo.png" alt="Logo">
                                 </p>
                             </div>
                             <div class="col-md-10 col-xs-10">
