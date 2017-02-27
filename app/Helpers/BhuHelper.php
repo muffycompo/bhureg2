@@ -71,12 +71,14 @@ function carryOverCourses($regno, $semester = null){
         // Check if a course has not been passed by Student
         // 45 Passmark for BHU/12 and above
         // Few Exceptions for Spill-Over students
+        // A case of a student (BHU/11/02/02/0039) which have passed during 2013/2014 using Old standard
 
         foreach ($processCoursesScore as $score) {
             // 40 Passmark for BHU/11 and below
             if($score['sessions_session_id'] == '2009/2010' or
                 $score['sessions_session_id'] == '2010/2011' or
-                $score['sessions_session_id'] == '2011/2012'){
+                $score['sessions_session_id'] == '2011/2012' or
+                ($score['sessions_session_id'] == '2013/2014') && str_contains($score['students_student_id'],'BHU/11')){
                 if(max($score['total_score']) < 40){
                     $results[$score['courses_course_id']] = $score;
                 }

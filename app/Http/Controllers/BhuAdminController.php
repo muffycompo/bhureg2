@@ -249,7 +249,6 @@ class BhuAdminController extends Controller
     public function downloadSampleCsv()
     {
         $sampleFilePath = public_path('uploads') . '/RESULT_UPLOAD_SAMPLE.csv';
-//        dd($sampleFilePath);
         return response()->download($sampleFilePath);
     }
 
