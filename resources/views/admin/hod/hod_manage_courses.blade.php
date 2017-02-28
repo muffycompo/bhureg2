@@ -35,13 +35,15 @@
                                     <td>{{ expandSemester($course->semester) }}</td>
                                     <td>{{ expandLevel($course->course_level) }}</td>
                                     <td>
-                                        <a href="{{ route('admin.hod_manage_edit_course',[encryptId($course->courses_course_id),$course->semester,$course->course_level]) }}" title="Edit" alt="Edit" class="text-info">
+                                        <a href="{{ route('admin.hod_manage_edit_course',[encryptId($course->courses_course_id),$course->semester,$course->course_level]) }}" data-toggle="tooltip" data-placement="top" title="Edit" alt="Edit" class="text-info">
                                             <span class="glyphicon glyphicon-edit"></span>
                                         </a>
                                         {{--*/ $sn += 1 /*--}}
-                                        &nbsp;<a href="javascript:;" data-toggle="modal" data-target="#hodDeleteCourseModal{{ $sn }}" class="text-danger">
-                                            <span class="glyphicon glyphicon-remove"></span>
-                                        </a>
+                                        <span data-toggle="modal" data-target="#hodDeleteCourseModal{{ $sn }}">
+                                            &nbsp;<a href="javascript:;" data-toggle="tooltip" data-placement="top" class="text-danger" title="Delete" Alt="Delete">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </a>
+                                        </span>
 
                                         @include('bhu._partials._hod_delete_course_warning_modal')
                                     </td>

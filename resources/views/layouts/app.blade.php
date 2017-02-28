@@ -66,19 +66,19 @@
                         @endif
                         <!-- Student Authentication Links -->
                         @if (!Auth::guest())
-                            <li>
+                            <li class="{{ isset($current_nav) && $current_nav == 'dashboard' ? 'active' : '' }}">
                                 <a href="{{ route('dashboard') }}">
                                     <span class="glyphicon glyphicon-home"></span>
                                     Dashboard
                                 </a>
                             </li>
-                            <li>
+                            <li class="{{ isset($current_nav) && $current_nav == 'register_course' ? 'active' : '' }}">
                                 <a href="{{ route('get.register') }}">
                                     <span class="glyphicon glyphicon-th-list"></span>
                                     Register Courses
                                 </a>
                             </li>
-                            <li>
+                            <li class="{{ isset($current_nav) && $current_nav == 'print_form' ? 'active' : '' }}">
                                 <a href="{{ route('get.print_course') }}">
                                     <span class="glyphicon glyphicon-print"></span>
                                     Printable Form
@@ -133,9 +133,12 @@
                                     Result Adjustment
                                 </a>
                             </li>
-                            {{--<li>--}}
-                                {{--<a href="#">Report</a>--}}
-                            {{--</li>--}}
+                            <li class="{{ isset($current_nav) && $current_nav == 'manage_reports' ? 'active' : '' }}">
+                                <a href="#">
+                                    <span class="glyphicon glyphicon-stats"></span>
+                                    Reports
+                                </a>
+                            </li>
                         @endif
                         <!-- Lecturer: Admin Links -->
                         @if(session()->has('role') && session('role') == 'Lecturer')
@@ -182,5 +185,6 @@
     {{--<script src="/js/app.js"></script>--}}
     {!! Html::script('/js/jquery.min.js') !!}
     {!! Html::script('/js/bootstrap.min.js') !!}
+    {!! Html::script('/js/custom.js') !!}
 </body>
 </html>

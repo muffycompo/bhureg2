@@ -25,6 +25,7 @@ class BhuLoginController extends Controller
                 ->with(compact('courses'))
                 ->with(compact('carryovers'))
                 ->with('sn',1)
+                ->with('current_nav','register_course')
                 ->with('units',0);
     }
 
@@ -53,6 +54,7 @@ class BhuLoginController extends Controller
         return view('bhu.print_registration')
                     ->with(compact('courses'))
                     ->with('sn',1)
+                    ->with('current_nav','print_form')
                     ->with('units',0);
 
     }

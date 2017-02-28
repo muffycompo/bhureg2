@@ -34,9 +34,11 @@
                                     <td>{{ $assignedCourse->sessions_session_id }}</td>
                                     <td>
                                         {{--*/ $sn += 1 /*--}}
-                                        <a href="javascript:;" data-toggle="modal" data-target="#hodUnassignCourseModal{{ $sn }}" class="text-danger">
-                                            <span class="glyphicon glyphicon-remove"></span>
-                                        </a>
+                                        <span data-toggle="modal" data-target="#hodUnassignCourseModal{{ $sn }}">
+                                            <a href="javascript:;" data-toggle="tooltip" data-placement="top" class="text-danger" title="Unassign" alt="Unassign">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </a>
+                                        </span>
 
                                         @include('bhu._partials._hod_unassign_course_warning_modal')
 

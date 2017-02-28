@@ -36,7 +36,7 @@
                                     <td>
                                         <?php $units = $units + (int) courseTitleAndUnits($course->courses_course_id,true); ?>
                                         {!! Form::hidden('course_id[]',$course->courses_course_id) !!}
-                                        <a href="{{ route('get.drop_course',[base64_encode($course->courses_course_id)]) }}" class="text-danger" style="cursor: pointer;" title="Drop Course" alt="Drop Course">
+                                        <a href="{{ route('get.drop_course',[base64_encode($course->courses_course_id)]) }}" class="text-danger" style="cursor: pointer;" data-toggle="tooltip" data-placement="top" title="Drop Course" alt="Drop Course">
                                             <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
                                         </a>
                                     </td>

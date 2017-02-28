@@ -23,7 +23,7 @@
                                 <td>{{ courseTitleAndUnits($course->courses_course_id) }}</td>
                                 <td>{{ courseTitleAndUnits($course->courses_course_id,true) }}</td>
                                 <td>
-                                    <a href="{{ route('admin.lecturer_manage_result',[encryptId($course->courses_course_id)]) }}" title="Manage Results" alt="Manage Results">
+                                    <a href="{{ route('admin.lecturer_manage_result',[encryptId($course->courses_course_id)]) }}" data-toggle="tooltip" data-placement="top" title="Manage Results" alt="Manage Results">
                                         <span class="glyphicon glyphicon-list-alt"></span>
                                     </a>
                                 </td>

@@ -65,14 +65,12 @@
                                     <td>{{ expandSemester($course->semester) }}</td>
                                     <td>{{ expandLevel($course->course_level) }}</td>
                                     <td>
-                                        <a href="{{ route('admin.hod_manage_add_core_course',[encryptId($course->course_id), $course->semester, $course->course_level]) }}" title="Edit" alt="Edit" class="btn btn-primary">
-                                            <span class="glyphicon glyphicon-plus"></span>
-                                            Core
+                                        <a href="{{ route('admin.hod_manage_add_core_course',[encryptId($course->course_id), $course->semester, $course->course_level]) }}" data-toggle="tooltip" data-placement="top" title="Core" alt="Core" class="text-primary">
+                                            <span class="glyphicon glyphicon-object-align-left"></span>
                                         </a>
                                         &nbsp;
-                                        <a href="{{ route('admin.hod_manage_add_elective_course',[encryptId($course->course_id), $course->semester, $course->course_level]) }}" title="Delete" alt="Delete" class="btn btn-danger">
-                                            <span class="glyphicon glyphicon-plus"></span>
-                                            Elective
+                                        <a href="{{ route('admin.hod_manage_add_elective_course',[encryptId($course->course_id), $course->semester, $course->course_level]) }}" data-toggle="tooltip" data-placement="top" title="Elective" alt="Elective" class="text-danger">
+                                            <span class="glyphicon glyphicon-object-align-right"></span>
                                         </a>
                                     </td>
                                 </tr>

@@ -30,7 +30,7 @@
                                     <td>{{ expandSemester($adjustment->semester) }}</td>
                                     <td>
                                         {{--<a href="javascript:;" data-toggle="modal" data-target="#hodUnassignCourseModal" class="text-danger">--}}
-                                        <a href="{{ route('admin.hod_manage_result_adjustment',[encryptId($adjustment->courses_course_id),encryptId($adjustment->user_id),$adjustment->semester]) }}" class="text-info" alt="Adjust Result" title="Adjust Result">
+                                        <a href="{{ route('admin.hod_manage_result_adjustment',[encryptId($adjustment->courses_course_id),encryptId($adjustment->user_id),$adjustment->semester]) }}" class="text-info" data-toggle="tooltip" data-placement="top" alt="Adjust Result" title="Adjust Result">
                                             <span class="glyphicon glyphicon-edit"></span>
                                         </a>
                                     </td>
