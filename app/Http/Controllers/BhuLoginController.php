@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\CourseRegistration;
-use Illuminate\Http\Request;
 
 class BhuLoginController extends Controller
 {
@@ -14,6 +13,9 @@ class BhuLoginController extends Controller
 
     public function index()
     {
+        if(Auth::check()){
+            return redirect()->route('dashboard');
+        }
         return redirect('/login');
     }
 

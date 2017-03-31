@@ -43,7 +43,7 @@
                             </tr>
                         @else
                             <tr>
-                                <td colspan="6">You have not assigned any Course to a Lecturer!.</td>
+                                <td colspan="6">No Result(s) has been submitted for Adjustment.</td>
                             </tr>
                         @endif
                     </table>

@@ -18,4 +18,5 @@ return array(
     '58571171fd5812e6e447dce228f52f4d' => $vendorDir . '/laravel/framework/src/Illuminate/Support/helpers.php',
     'f18cc91337d49233e5754e93f3ed9ec3' => $vendorDir . '/laravelcollective/html/src/helpers.php',
     'aa0fef4d57ddc6c4fda5c5ac111d9622' => $baseDir . '/app/Helpers/BhuHelper.php',
+    '3b1e1195cd81123d33d76a49638023ba' => $baseDir . '/app/Helpers/BhuReportHelper.php',
 );

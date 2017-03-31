@@ -24,6 +24,9 @@
                                 <label for="user_id">Lecturer</label>
                                 {!! Form::select('user_id',lecturersDropdownOptions(),null,['class' => 'form-control', 'id' => 'user_id']) !!}
                                 <p class="help-block"><em>{{ expandProgram(session('departments_department_id')) }} Lecturers Only!</em></p>
+                                @if ($errors->has('user_id'))
+                                    <span class="text-danger">{{ $errors->first('user_id') }}</span>
+                                @endif
                             </div>
                         </div>
                         <div class="col-md-6 col-xs-6">

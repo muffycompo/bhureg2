@@ -27,7 +27,8 @@
             "App\\": "app/"
         },
         "files": [
-            "app/Helpers/BhuHelper.php"
+            "app/Helpers/BhuHelper.php",
+            "app/Helpers/BhuReportHelper.php"
         ]
     },
     "autoload-dev": {

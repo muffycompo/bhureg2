@@ -18,6 +18,7 @@ class BhuAdmin extends Model
         $password = md5($data['password']);
         $user = $this->where('user_id', $username)
             ->where('pwd', $password)
+            ->whereIn('role',['Lecturer','HOD','Dean','Senate'])
             ->first();
 
         if($user) {
@@ -26,6 +27,13 @@ class BhuAdmin extends Model
         }
 
         return false;
+    }
+
+    public function changeAdminPassword($password)
+    {
+        $password = md5($password['password']);
+        $userId = session('user_id');
+        return $this->where('user_id', $userId)->update(['pwd' => $password]);
     }
 
 

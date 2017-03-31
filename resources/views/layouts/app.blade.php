@@ -85,7 +85,7 @@
                                 </a>
                             </li>
                             <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                                     <span class="glyphicon glyphicon-user"></span>
                                     {{ ucwords(strtolower(session('firstname'))) . ' ' . ucwords(strtolower(session('surname'))) . ' (' . Auth::user()->regno . ')' }} <span class="caret"></span>
                                 </a>
@@ -133,12 +133,6 @@
                                     Result Adjustment
                                 </a>
                             </li>
-                            <li class="{{ isset($current_nav) && $current_nav == 'manage_reports' ? 'active' : '' }}">
-                                <a href="#">
-                                    <span class="glyphicon glyphicon-stats"></span>
-                                    Reports
-                                </a>
-                            </li>
                         @endif
                         <!-- Lecturer: Admin Links -->
                         @if(session()->has('role') && session('role') == 'Lecturer')
@@ -155,10 +149,56 @@
                                 </a>
                             </li>
                         @endif
+                        <!-- End Lecturer: Admin Links -->
 
-                        @if(session('role') == 'Lecturer' or session('role') == 'HOD')
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                        <!-- Dean: Admin Links -->
+                        @if(session()->has('role') && session('role') == 'Dean')
+                            <li class="{{ isset($current_nav) && $current_nav == 'dashboard' ? 'active' : '' }}">
+                                <a href="{{ route('admin.dashboard') }}">
+                                    <span class="glyphicon glyphicon-home"></span>
+                                    Dashboard
+                                </a>
+                            </li>
+                        @endif
+                        <!-- End Dean: Admin Links -->
+
+                        <!-- Senate: Admin Links -->
+                        @if(session()->has('role') && session('role') == 'Senate')
+                            <li class="{{ isset($current_nav) && $current_nav == 'dashboard' ? 'active' : '' }}">
+                                <a href="{{ route('admin.dashboard') }}">
+                                    <span class="glyphicon glyphicon-home"></span>
+                                    Dashboard
+                                </a>
+                            </li>
+                            @endif
+                        <!-- End Senate: Admin Links -->
+
+                        @if(session('role') == 'HOD' or session('role') == 'Dean' or session('role') == 'Senate')
+                            <li class="dropdown {{ isset($current_nav) && $current_nav == 'manage_reports' ? 'active' : '' }}">
+                                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                    <span class="glyphicon glyphicon-stats"></span>
+                                    Reports <span class="caret"></span>
+                                </a>
+
+                                <ul class="dropdown-menu" role="menu">
+                                    <li>
+                                        <a href="{{ route('admin.get_reports') }}">
+                                            <span class="glyphicon glyphicon-check"></span>
+                                            Result Approvals
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('admin.get_detailed_reports') }}">
+                                            <span class="glyphicon glyphicon-list"></span>
+                                            Detailed Reports
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endif
+                        @if(session('role') == 'Lecturer' or session('role') == 'HOD' or session('role') == 'Dean' or session('role') == 'Senate')
+                            <li class="dropdown {{ isset($current_nav) && $current_nav == 'user_settings' ? 'active' : '' }}">
+                                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                                     <span class="glyphicon glyphicon-user"></span>
                                     {{ ucwords(strtolower(session('first_name'))) . ' ' . ucwords(strtolower(session('last_name'))) }} <span class="caret"></span>
                                 </a>
@@ -168,6 +208,10 @@
                                         <a href="{{ route('admin.logout') }}">
                                             <span class="glyphicon glyphicon-log-out"></span>
                                             Logout
+                                        </a>
+                                        <a href="{{ route('admin.change_password') }}">
+                                            <span class="glyphicon glyphicon-lock"></span>
+                                            Change Password
                                         </a>
                                     </li>
                                 </ul>

@@ -81,6 +81,7 @@ class CourseRegistration extends Model
 
     public function saveCourseResultHod($lecturerId, $cas, $exams, $students, $courseId, $session, $semester)
     {
+        $role = session('role');
         $casCount = count($cas['ca']);
         for ($i = 0; $i < $casCount; $i++) {
             $ca = (float) $cas['ca'][$i];
@@ -95,7 +96,7 @@ class CourseRegistration extends Model
                     ]);
         }
         // Finalize HOD editing privileges
-        return finalizeCourseResultHod($lecturerId, $courseId, $session);
+        return finalizeCourseResult($lecturerId, $courseId, $session, $role);
     }
 
     public function uploadCourseResult($request, $courseId, $session, $semester)

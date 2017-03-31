@@ -4,21 +4,23 @@ namespace App\Http\Controllers;
 
 use App\BhuAdmin;
 use App\CourseRegistration;
-use Illuminate\Http\Request;
-
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
+use App\Http\Requests\ChangePasswordFormRequest;
+use App\Http\Requests\HodManageAssignCourseRequest;
 use Excel;
+use Illuminate\Http\Request;
 
 class BhuAdminController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth.admin', ['except' => ['getLogin','postLogin']]);
+        $this->middleware('auth.admin', ['except' => ['getLogin','postLogin','getLogout']]);
     }
 
     public function getLogin()
     {
+        if(session()->has('role')){
+            return redirect()->route('admin.dashboard');
+        }
         return view('admin.admin_login');
     }
 
@@ -26,6 +28,12 @@ class BhuAdminController extends Controller
     {
         return view('admin.dashboard')
                     ->with('current_nav','dashboard');
+    }
+
+    public function getChangePassword()
+    {
+        return view('admin.change_password')
+                    ->with('current_nav','user_settings');
     }
 
     public function getLogout()
@@ -90,7 +98,9 @@ class BhuAdminController extends Controller
     public function lecturerFinalizeCourseResult($courseId)
     {
         $courseId = decryptId($courseId);
-        if(finalizeCourseResult($courseId, currentAcademicSession())){
+        $userId = session('user_id');
+        $role = session('role');
+        if(finalizeCourseResult($userId,$courseId, currentAcademicSession(),$role)){
             return redirect()->back();
         } else {
             return redirect()->back()->with([
@@ -287,7 +297,7 @@ class BhuAdminController extends Controller
         }
     }
 
-    public function postHodManageAssignCourse(Request $request)
+    public function postHodManageAssignCourse(HodManageAssignCourseRequest $request)
     {
         $userId = $request->get('user_id');
         $semester = $request->get('semester');
@@ -336,6 +346,22 @@ class BhuAdminController extends Controller
                 ->with('admin_error','Username/Password combination is Invalid');
         } else {
             return redirect()->route('admin.dashboard');
+        }
+    }
+
+    public function postChangePassword(ChangePasswordFormRequest $request, BhuAdmin $admin)
+    {
+        $passwordChange = $admin->changeAdminPassword($request->only(['password']));
+
+        if($passwordChange){
+            return redirect()->route('admin.logout')->with([
+                'admin_error' => 'Password has been changed, Login below with your new Password.'
+            ]);
+        } else {
+            return redirect()->back()->with([
+                'flash_message' => 'An error occurred while changing your Password, please try again!',
+                'flash_type'    => 'danger'
+            ]);
         }
     }
 
