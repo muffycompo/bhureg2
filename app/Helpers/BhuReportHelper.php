@@ -109,6 +109,33 @@ function manageAdminDetailedResultsReport($deptId, $sessionId, $semesterId, $lev
 
 }
 
+function manageAdminRemarkResultsReport($deptId, $sessionId, $semesterId, $levelId){
+    // Get Students in Level in Department
+    if($deptId == 'MED') { $deptId = 'MBBS'; }
+    if($deptId == 'BIOS') { $deptId = 'MIC'; }
+
+    $registeredStudents = [];
+    $students = DB::connection('mysql')->table('studentbiodata')
+                    ->where('deptid', $deptId)
+                    ->where('levelid', $levelId)
+                    ->orderBy('surname')
+                    ->orderBy('firstname')
+                    ->orderBy('regno')
+                    ->get(['regno','deptid','levelid']);
+
+    // Check students with complete registration
+    if($students){
+        foreach($students as $student){
+            if(studentRegisteredForAnyCourse($student->regno, $sessionId, $semesterId)){
+                $registeredStudents[] = $student;
+            }
+        }
+    }
+
+    return $registeredStudents;
+
+}
+
 function studentRegisteredForTheSemesterSession($studentId, $sessionId, $semesterId, $returnRegisteredCourses = false){
     $role = session('role');
     if($returnRegisteredCourses){
@@ -124,6 +151,14 @@ function studentRegisteredForTheSemesterSession($studentId, $sessionId, $semeste
                             ->where('sessions_session_id', $sessionId)
                             ->where('semester', $semesterId)
                             ->exists();
+}
+
+function studentRegisteredForAnyCourse($studentId, $sessionId, $semesterId){
+    return DB::connection('mysql2')->table('course_registration')
+        ->where('students_student_id', $studentId)
+        ->where('sessions_session_id', $sessionId)
+        ->where('semester', $semesterId)
+        ->exists();
 }
 
 function expandStudentName($studentId){
@@ -172,4 +207,195 @@ function expandFaculty($facultyId){
                         ->where('faculty_id', $facultyId)
                         ->first(['faculty_name']);
     return $faculty ? $faculty->faculty_name : '';
+}
+
+function getPreviousTotalUnit($studentId, $registered = false, $earned = false){
+    $totalUnits = 0;
+//    if($earned){
+//        $courses = DB::connection('mysql2')->table('course_registration')
+//            ->where('students_student_id', $studentId)
+//            ->where('sessions_session_id','!=',currentAcademicSession())
+//            ->where('approval_status','=','Senate')
+//            ->get();
+//    } else {
+//        $courses = DB::connection('mysql2')->table('course_registration')
+//            ->where('students_student_id', $studentId)
+//            ->where('sessions_session_id','!=',currentAcademicSession())
+//            ->get();
+//    }
+    $courses = DB::connection('mysql2')->table('course_registration')
+        ->where('students_student_id', $studentId)
+        ->where('sessions_session_id','!=',currentAcademicSession())
+        ->get();
+
+
+    // Total Credit Registered
+    if($registered){
+        if(count($courses) > 0){
+            foreach ($courses as $course) {
+                $totalUnits = $totalUnits + courseTitleAndUnits($course->courses_course_id,true);
+            }
+        }
+
+        return $totalUnits;
+    }
+
+    // Total Credit Earned
+    if($earned){
+        $coursesPassed = [];
+        if($courses){
+            foreach ($courses as $course) {
+                if($course->sessions_session_id == '2009/2010' or
+                    $course->sessions_session_id == '2010/2011' or
+                    $course->sessions_session_id == '2011/2012' or
+                    $course->sessions_session_id == '2012/2013' or
+                    $course->sessions_session_id == '2013/2014' && str_contains($course->students_student_id,'BHU/11')){
+
+                    // Old Grading System Applies
+                    $score = $course->exam + $course->ca;
+                    if($score >= 40) { $coursesPassed[] = $course; }
+                } else {
+                    // New Grading System Applies
+                    $score = $course->exam + $course->ca;
+                    if($score >= 45) { $coursesPassed[] = $course; }
+                }
+            }
+
+            if(count($coursesPassed) > 0){
+                foreach ($coursesPassed as $coursesPass) {
+                    $totalUnits = $totalUnits + courseTitleAndUnits($coursesPass->courses_course_id,true);
+                }
+            }
+
+            return $totalUnits;
+        }
+    }
+}
+
+function getCurrentUnits($studentId, $registered = false, $earned = false){
+    $totalUnits = 0;
+//    if($earned){
+//        $courses = DB::connection('mysql2')->table('course_registration')
+//            ->where('students_student_id', $studentId)
+//            ->where('sessions_session_id','=',currentAcademicSession())
+//            ->where('approval_status','=','Senate')
+//            ->get();
+//    } else {
+//        $courses = DB::connection('mysql2')->table('course_registration')
+//            ->where('students_student_id', $studentId)
+//            ->where('sessions_session_id','=',currentAcademicSession())
+//            ->get();
+//    }
+
+    $courses = DB::connection('mysql2')->table('course_registration')
+        ->where('students_student_id', $studentId)
+        ->where('sessions_session_id','=',currentAcademicSession())
+        ->get();
+
+    // Total Credit Registered
+    if($registered){
+        if(count($courses) > 0){
+            foreach ($courses as $course) {
+                $totalUnits = $totalUnits + courseTitleAndUnits($course->courses_course_id,true);
+            }
+        }
+
+        return $totalUnits;
+    }
+
+    // Total Credit Earned
+    if($earned){
+        $coursesPassed = [];
+        if($courses){
+            foreach ($courses as $course) {
+                if($course->sessions_session_id == '2009/2010' or
+                    $course->sessions_session_id == '2010/2011' or
+                    $course->sessions_session_id == '2011/2012' or
+                    $course->sessions_session_id == '2012/2013' or
+                    $course->sessions_session_id == '2013/2014' && str_contains($course->students_student_id,'BHU/11')){
+
+                    // Old Grading System Applies
+                    $score = $course->exam + $course->ca;
+                    if($score >= 40) { $coursesPassed[] = $course; }
+                } else {
+                    // New Grading System Applies
+                    $score = $course->exam + $course->ca;
+                    if($score >= 45) { $coursesPassed[] = $course; }
+                }
+            }
+
+            if(count($coursesPassed) > 0){
+                foreach ($coursesPassed as $coursesPass) {
+                    $totalUnits = $totalUnits + courseTitleAndUnits($coursesPass->courses_course_id,true);
+                }
+            }
+        }
+        return $totalUnits;
+    }
+}
+
+function getWeightedGradePoint($studentId, $previousTotal = false){
+    $coursesScorePoints = 0;
+    if($previousTotal){
+        $courses = DB::connection('mysql2')->table('course_registration')
+            ->where('students_student_id', $studentId)
+            ->where('sessions_session_id','!=',currentAcademicSession())
+            ->get();
+    } else {
+        $courses = DB::connection('mysql2')->table('course_registration')
+            ->where('students_student_id', $studentId)
+            ->where('sessions_session_id','=',currentAcademicSession())
+            ->get();
+    }
+
+
+    if($courses){
+        foreach ($courses as $course) {
+            $score = $course->exam + $course->ca;
+            $unitPoints  = courseTitleAndUnits($course->courses_course_id,true);
+            if($course->sessions_session_id == '2009/2010' or
+                $course->sessions_session_id == '2010/2011' or
+                $course->sessions_session_id == '2011/2012' or
+                $course->sessions_session_id == '2012/2013' or
+                $course->sessions_session_id == '2013/2014' && str_contains($course->students_student_id,'BHU/11')){
+
+                // Old Grading System Applies
+                $points = expandGrade($score,true,true);
+                if(! is_null($course->approval_status)) { $coursesScorePoints = (int) $coursesScorePoints + ( (int) $points * (int) $unitPoints ); }
+            } else {
+                // New Grading System Applies
+                $points = expandGrade($score,false,true);
+                if(! is_null($course->approval_status)) { $coursesScorePoints = (int) $coursesScorePoints + ( (int) $points * (int) $unitPoints ); }
+            }
+        }
+    }
+
+    return $coursesScorePoints;
+}
+
+function getGradePointAverage($upper, $lower){
+    $avg = 0;
+    if($upper > 0 && $lower > 0){
+        $avg = $upper / $lower;
+        return round($avg, 2);
+    }
+    return $avg;
+}
+
+function getRemarkCarryOvers($studentId){
+    $results = carryOverCourses($studentId);
+    if(count($results) > 0){
+        $carryOverStr = '';
+        foreach ($results as $code => $result) {
+            $carryOverStr .= $code . ', ';
+        }
+        return rtrim($carryOverStr, ', ');
+    } else {
+        return 'Pass';
+    }
+}
+function getSummaryCarryOversPass($studentId){
+    $results = carryOverCourses($studentId);
+    return (count($results) > 0)? 1 : 0;
+
 }

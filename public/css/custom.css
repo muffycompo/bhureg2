@@ -37,6 +37,12 @@
     border-top: 1px solid #444;
 }
 
+.signature-title > .signature-line {
+    display: inline-block;
+    border-bottom: 1px solid #444;
+    width: 350px;
+}
+
 .panel .panel-xs-padding {
     padding: 10% 3% 3% 3%;
 }

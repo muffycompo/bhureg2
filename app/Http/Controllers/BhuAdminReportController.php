@@ -95,7 +95,7 @@ class BhuAdminReportController extends Controller
         }
     }
 
-    public function manageAdminDetailedCourseResults($deptId, $sessionId, $semesterId, $levelId, $reportType)
+    public function manageAdminDetailedCourseResults($deptId, $sessionId, $semesterId, $levelId)
     {
         $deptId = decryptId($deptId);
         $sessionId = decryptId($sessionId);
@@ -115,14 +115,54 @@ class BhuAdminReportController extends Controller
                     ->with(compact('registeredCourses'));
     }
 
+    public function manageAdminSummaryCourseResults($deptId, $sessionId, $semesterId, $levelId)
+    {
+        $deptId = decryptId($deptId);
+        $sessionId = decryptId($sessionId);
+        $semesterId = decryptId($semesterId);
+        $levelId = decryptId($levelId);
+        $maxWidth = [];
+        $headerCourses = [];
+        $registeredCourses = manageAdminDetailedResultsReport($deptId, $sessionId, $semesterId, $levelId);
+        return view('admin.report.admin_reports_results_summary')
+                    ->with(compact('maxWidth'))
+                    ->with(compact('headerCourses'))
+                    ->with(compact('sessionId'))
+                    ->with(compact('semesterId'))
+                    ->with(compact('levelId'))
+                    ->with(compact('deptId'))
+                    ->with('sn',1)
+                    ->with(compact('registeredCourses'));
+    }
+
+    public function manageAdminRemarkCourseResults($deptId, $sessionId, $semesterId, $levelId)
+    {
+        $deptId = decryptId($deptId);
+        $sessionId = decryptId($sessionId);
+        $semesterId = decryptId($semesterId);
+        $levelId = decryptId($levelId);
+        $registeredStudents = manageAdminRemarkResultsReport($deptId, $sessionId, $semesterId, $levelId);
+        return view('admin.report.admin_reports_results_remark')
+                    ->with(compact('sessionId'))
+                    ->with(compact('semesterId'))
+                    ->with(compact('levelId'))
+                    ->with(compact('deptId'))
+                    ->with('sn',1)
+                    ->with(compact('registeredStudents'));
+    }
+
     public function manageAdminFindDetailedReport(Request $request)
     {
+//        dd($request->all());
         $deptId = (session('role') == 'HOD' or session('role') == 'Lecturer') ? $deptId = encryptId(session('departments_department_id')) : $deptId = encryptId($request->get('department_id'));
         $sessionId = encryptId($request->get('session_id'));
         $semesterId = encryptId($request->get('semester'));
         $levelId = encryptId($request->get('level_id'));
         $reportType = $request->get('report');
 
-        return redirect()->route('admin.report_detailed_results',[$deptId,$sessionId,$semesterId,$levelId,$reportType]);
+        if($reportType == 'detailed_result') return redirect()->route('admin.report_detailed_results',[$deptId,$sessionId,$semesterId,$levelId]);
+        if($reportType == 'detailed_summary') return redirect()->route('admin.report_results_summary',[$deptId,$sessionId,$semesterId,$levelId]);
+        if($reportType == 'detailed_remark') return redirect()->route('admin.report_results_remark',[$deptId,$sessionId,$semesterId,$levelId]);
+        return redirect()->back();
     }
 }

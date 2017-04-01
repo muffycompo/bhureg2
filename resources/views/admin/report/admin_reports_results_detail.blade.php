@@ -66,7 +66,9 @@
                                     <tr>
                                         <td>{{ $sn++ }}</td>
                                         <td nowrap="nowrap">{{ expandStudentName($regno) }}</td>
-                                        <td>{{ $regno }}</td>
+                                        <td>
+                                            {{ $regno }}
+                                        </td>
                                         @foreach($headerCourses as $course_id => $value)
                                             <td class="text-center">{{ courseResultStringFormat($regno, $course_id, $sessionId, $semesterId) }}</td>
                                         @endforeach
