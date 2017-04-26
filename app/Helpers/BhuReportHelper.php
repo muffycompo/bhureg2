@@ -270,6 +270,7 @@ function getPreviousTotalUnit($studentId, $registered = false, $earned = false){
             return $totalUnits;
         }
     }
+    return $totalUnits;
 }
 
 function getCurrentUnits($studentId, $registered = false, $earned = false){
@@ -332,6 +333,7 @@ function getCurrentUnits($studentId, $registered = false, $earned = false){
         }
         return $totalUnits;
     }
+    return $totalUnits;
 }
 
 function getWeightedGradePoint($studentId, $previousTotal = false){
@@ -397,5 +399,19 @@ function getRemarkCarryOvers($studentId){
 function getSummaryCarryOversPass($studentId){
     $results = carryOverCourses($studentId);
     return (count($results) > 0)? 1 : 0;
+
+}
+
+function sessionsDropDownOptions(){
+    $options = [];
+    $sessions = DB::connection('mysql2')->table('sessions')
+                    ->orderBy('session_id','DESC')
+                    ->lists('session_id');
+
+    foreach ($sessions as $session){
+        $options[$session] = $session;
+    }
+
+    return $options;
 
 }

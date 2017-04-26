@@ -25,7 +25,7 @@
                         <div class="col-md-3 col-xs-3">
                             <div class="form-group">
                                 <label for="session_id">Session</label>
-                                {!! Form::select('session_id',['2016/2017' => '2016/2017'],$sessionId,['class' => 'form-control', 'id' => 'session_id']) !!}
+                                {!! Form::select('session_id',sessionsDropDownOptions(),$sessionId,['class' => 'form-control', 'id' => 'session_id']) !!}
                             </div>
                         </div>
                         <div class="col-md-3 col-xs-3">

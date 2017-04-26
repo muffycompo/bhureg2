@@ -9,7 +9,7 @@
             @include('bhu._partials._alert')
 
             <div class="panel panel-default">
-                <div class="panel-heading"><strong>Registration Session: 2016/2017 | Department: {{ expandProgram(session('deptid')) }} | Level: {{ expandLevel(session('levelid')) }}</strong></div>
+                <div class="panel-heading"><strong>Registration Session: {{ currentAcademicSession() }} | Department: {{ expandProgram(session('deptid')) }} | Level: {{ expandLevel(session('levelid')) }}</strong></div>
 
                 <div class="panel-body">
 
@@ -32,7 +32,7 @@
                                 <td nowrap="nowrap">{{ courseTitleAndUnits($course->courses_course_id) }}</td>
                                 <td>{{ courseTitleAndUnits($course->courses_course_id,true) }}</td>
                                 <td>{{ $course->course_type }}</td>
-                                @if(isCourseRegistered($course->courses_course_id,'2016/2017'))
+                                @if(isCourseRegistered($course->courses_course_id,currentAcademicSession()))
                                     <td>
                                         <?php $units = $units + (int) courseTitleAndUnits($course->courses_course_id,true); ?>
                                         {!! Form::hidden('course_id[]',$course->courses_course_id) !!}
@@ -84,7 +84,7 @@
                         @endif
                         {!! Form::close() !!}
                     </table>
-                    @if($units > 30)
+                    @if($units > maxRegistrationUnits())
                         <div class="alert alert-danger" role="alert">
                             <p><strong>Total Credit Units of {{ $units }} EXCEEDS maximum allowed by the Department!!!</strong> Your registration is considered INVALID</p>
                         </div>

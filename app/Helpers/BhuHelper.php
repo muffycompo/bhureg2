@@ -362,6 +362,7 @@ function expandSemester($semesterId){
     $semester = [
         '1' => 'First',
         '3' => 'Second',
+        '4' => 'Summer',
     ];
     return array_key_exists($semesterId,$semester)? $semester[$semesterId] : '';
 }
@@ -512,12 +513,26 @@ function hodLecturerResultSubmission($deptId, $session){
                 ->paginate(25);
 }
 
+//function currentAcademicSession(){
+//    return '2016/2017';
+//}
+
 function currentAcademicSession(){
-    return '2016/2017';
+    $session = DB::connection('mysql2')->table('sessions')
+        ->orderBy('session_id','DESC')
+        ->first(['session_id']);
+    return $session ? $session->session_id : '';
 }
+//
+//function currentSemester(){
+//    return 1;
+//}
 
 function currentSemester(){
-    return 1;
+    $semester = DB::connection('mysql2')->table('utilities')
+        ->where('utility_id','current_semester')
+        ->first(['utility_int_value']);
+    return $semester ? $semester->utility_int_value : 1;
 }
 
 function updateApprovalStatus($type, $courseId, $semester, $session){
@@ -561,4 +576,11 @@ function studentSkippedSessions($studentId, $sessionId){
                 ->where('student_id', $studentId)
                 ->where('session_id', $sessionId)
                 ->first();
+}
+
+function maxRegistrationUnits(){
+    $units = DB::connection('mysql2')->table('utilities')
+                ->where('utility_id','max_credit_units')
+                ->first(['utility_int_value']);
+    return $units ? $units->utility_int_value : 30;
 }

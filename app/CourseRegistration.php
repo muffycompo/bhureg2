@@ -30,7 +30,7 @@ class CourseRegistration extends Model
                     'ca' => 0,
                     'exam' => 0,
                     'approval_status' => null,
-                    'semester'          => 1,
+                    'semester'          => currentSemester(),
                     'students_student_id'       => session('regno'),
                     'sessions_session_id'    => $session,
                     'courses_course_id' =>  $courseId

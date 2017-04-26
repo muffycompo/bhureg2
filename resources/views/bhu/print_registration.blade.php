@@ -50,11 +50,11 @@
                                         </tr>
                                         <tr>
                                             <td>Registration Session</td>
-                                            <td>2016/2017</td>
+                                            <td>{{ currentAcademicSession() }}</td>
                                         </tr>
                                         <tr>
                                             <td>Semester</td>
-                                            <td>First</td>
+                                            <td>{{ expandSemester(currentSemester()) }}</td>
                                         </tr>
                                         <tr>
                                             <td>Program</td>
@@ -77,7 +77,7 @@
                         <div class="col-md-12 col-xs-12">
                             <div class="panel panel-default panel-custom-bg">
                                 <div class="panel-heading text-center">
-                                    <strong>Registered Courses for 2016/2017 Session, First Semester</strong>
+                                    <strong>Registered Courses for {{ currentAcademicSession() }} Session, First Semester</strong>
                                 </div>
                                 <div class="panel-body">
                                     <table class="table table-condensed table-bordered text-center panel-table-custom">
@@ -110,7 +110,7 @@
                                     <strong>Total Credit Units = {{ $units }}</strong>
                                 </div>
                             </div>
-                            @if($units > 30)
+                            @if($units > maxRegistrationUnits())
                                 <div class="alert alert-danger" role="alert">
                                     <p><strong>Total Credit Units of {{ $units }} EXCEEDS maximum allowed by the Department!!! Your registration is considered INVALID</strong></p>
                                 </div>

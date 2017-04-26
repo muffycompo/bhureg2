@@ -74,6 +74,10 @@
                                         @endforeach
                                     </tr>
                                     @endforeach
+                                @else
+                                    <tr>
+                                        <td><p>No Result(s) to display, kindly click <strong><a href="{{ route('admin.get_detailed_reports') }}">Back</a></strong> and check your selection criteria!</p></td>
+                                    </tr>
                                 @endif
                             </table>
                         </div>

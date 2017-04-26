@@ -131,6 +131,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-4 col-xs-4">
+                                @if(count($headerCourses) > 0)
                                 <table class="table table-condensed table-bordered">
                                     <tr>
                                         <th class="text-center" colspan="4">C<br>Summary</th>
@@ -180,6 +181,7 @@
                                         <td class="text-center">{{ round($notRegisteredPercent) }}%</td>
                                     </tr>
                                 </table>
+                                @endif
                             </div>
                             <div class="col-md-12 col-xs-12"><hr></div>
                             <div class="col-md-12 col-xs-12">
