@@ -22,7 +22,7 @@
                         BINGHAM UNIVERSITY<br>
                         {{ changeStringToUpperCase(expandFacultyFromDepartment($deptId)) }}<br>
                         DEPARTMENT OF {{ changeStringToUpperCase(expandProgram($deptId)) }}<br>
-                        {{ expandLevel($levelId) }} LEVEL (SUMMARY PAGE) FOR CATEGORY A STUDENTS<br>
+                        {{ expandLevel($levelId) }} LEVEL (SUMMARY PAGE)<br>
                         {{ changeStringToUpperCase(expandSemester($semesterId)) }} SEMESTER {{ $sessionId }} ACADEMIC SESSION<br>
                         {{ departmentalDegreeTitle($deptId) }}<br>
                         {{--APPROVAL LEVEL: {{ changeStringToUpperCase(session('role')) }}--}}
@@ -59,14 +59,16 @@
                                                 @endforeach
                                             </tr>
                                             @if(count($headerCourses) > 0)
-                                                <tr class="text-center">
-                                                    @foreach($headerCourses as $course_id => $value)
+
+                                                @foreach($headerCourses as $course_id => $value)
+                                                    <tr class="text-center">
                                                         <td>{{ $sn++ }}</td>
                                                         <td>{{ $course_id }}</td>
                                                         <td>{{ courseTitleAndUnits($course_id) }}</td>
                                                         <td>{{ courseTitleAndUnits($course_id, true) }}</td>
-                                                    @endforeach
-                                                </tr>
+                                                    </tr>
+                                                @endforeach
+
                                             @else
                                                 <tr>
                                                     <td colspan="4">No Courses to Display!</td>

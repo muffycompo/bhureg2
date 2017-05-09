@@ -22,7 +22,7 @@
                         BINGHAM UNIVERSITY<br>
                         {{ changeStringToUpperCase(expandFacultyFromDepartment($deptId)) }}<br>
                         DEPARTMENT OF {{ changeStringToUpperCase(expandProgram($deptId)) }}<br>
-                        {{ expandLevel($levelId) }} LEVEL (DETAILED RESULT PAGE) FOR CATEGORY A STUDENTS<br>
+                        {{ expandLevel($levelId) }} LEVEL (DETAILED RESULT PAGE)<br>
                         {{ changeStringToUpperCase(expandSemester($semesterId)) }} SEMESTER {{ $sessionId }} ACADEMIC SESSION<br>
                         {{ departmentalDegreeTitle($deptId) }}<br>
                         {{--APPROVAL LEVEL: {{ changeStringToUpperCase(session('role')) }}--}}

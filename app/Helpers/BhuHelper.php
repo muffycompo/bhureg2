@@ -282,6 +282,7 @@ function levelDropdownOptions(){
 function semesterDropdownOptions(){
     return [
         '1' => 'First',
+        '2' => 'Sandwich',
         '3' => 'Second',
         '4' => 'Summer',
     ];
@@ -361,6 +362,7 @@ function expandGrade($score, $oldGrade = false, $point = false){
 function expandSemester($semesterId){
     $semester = [
         '1' => 'First',
+        '2' => 'Sandwich',
         '3' => 'Second',
         '4' => 'Summer',
     ];

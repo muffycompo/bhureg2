@@ -85,6 +85,8 @@ function manageAdminDetailedResultsReport($deptId, $sessionId, $semesterId, $lev
     $students = DB::connection('mysql')->table('studentbiodata')
                     ->where('deptid', $deptId)
                     ->where('levelid', $levelId)
+                    ->orderBy('surname')
+                    ->orderBy('firstname')
                     ->orderBy('regno')
                     ->get(['regno','deptid','levelid']);
 
@@ -143,7 +145,7 @@ function studentRegisteredForTheSemesterSession($studentId, $sessionId, $semeste
             ->where('students_student_id', $studentId)
             ->where('sessions_session_id', $sessionId)
             ->where('semester', $semesterId)
-            ->where('approval_status', $role)
+//            ->where('approval_status', $role)
             ->get(['students_student_id','ca','exam','courses_course_id']);
     }
     return DB::connection('mysql2')->table('course_registration')
@@ -273,7 +275,7 @@ function getPreviousTotalUnit($studentId, $registered = false, $earned = false){
     return $totalUnits;
 }
 
-function getCurrentUnits($studentId, $registered = false, $earned = false){
+function getCurrentUnits($studentId, $registered = false, $earned = false, $sessionId = null, $semesterId = null){
     $totalUnits = 0;
 //    if($earned){
 //        $courses = DB::connection('mysql2')->table('course_registration')
@@ -287,10 +289,13 @@ function getCurrentUnits($studentId, $registered = false, $earned = false){
 //            ->where('sessions_session_id','=',currentAcademicSession())
 //            ->get();
 //    }
+    $sessionId = ! is_null($sessionId)? $sessionId : currentAcademicSession();
+    $semesterId = ! is_null($semesterId)? $semesterId : currentSemester();
 
     $courses = DB::connection('mysql2')->table('course_registration')
         ->where('students_student_id', $studentId)
-        ->where('sessions_session_id','=',currentAcademicSession())
+        ->where('sessions_session_id','=', $sessionId)
+        ->where('semester','=', $semesterId)
         ->get();
 
     // Total Credit Registered
@@ -336,17 +341,24 @@ function getCurrentUnits($studentId, $registered = false, $earned = false){
     return $totalUnits;
 }
 
-function getWeightedGradePoint($studentId, $previousTotal = false){
+function getWeightedGradePoint($studentId, $previousTotal = false, $sessionId = null, $semesterId = null){
     $coursesScorePoints = 0;
+    $sessionId = ! is_null($sessionId) ? $sessionId : currentAcademicSession();
+    $semesterId = ! is_null($semesterId) ? $semesterId : currentSemester();
     if($previousTotal){
+
+        $sessionYearArray = explode('/',$sessionId);
+        $sessionYear = $sessionYearArray[0];
         $courses = DB::connection('mysql2')->table('course_registration')
             ->where('students_student_id', $studentId)
-            ->where('sessions_session_id','!=',currentAcademicSession())
+            ->where('sessions_session_id','NOT LIKE', "$sessionYear%")
+            ->where('semester','=', $semesterId)
             ->get();
     } else {
         $courses = DB::connection('mysql2')->table('course_registration')
             ->where('students_student_id', $studentId)
-            ->where('sessions_session_id','=',currentAcademicSession())
+            ->where('sessions_session_id','=', $sessionId)
+            ->where('semester','=', $semesterId)
             ->get();
     }
 

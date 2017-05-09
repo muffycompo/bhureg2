@@ -22,7 +22,7 @@
                         BINGHAM UNIVERSITY<br>
                         {{ changeStringToUpperCase(expandFacultyFromDepartment($deptId)) }}<br>
                         DEPARTMENT OF {{ changeStringToUpperCase(expandProgram($deptId)) }}<br>
-                        {{ expandLevel($levelId) }} LEVEL (GRADE POINT AND REMARK PAGE) FOR CATEGORY A STUDENTS<br>
+                        {{ expandLevel($levelId) }} LEVEL (GRADE POINT AND REMARK PAGE)<br>
                         {{ changeStringToUpperCase(expandSemester($semesterId)) }} SEMESTER {{ $sessionId }} ACADEMIC SESSION<br>
                         {{ departmentalDegreeTitle($deptId) }}<br>
                         {{--APPROVAL LEVEL: {{ changeStringToUpperCase(session('role')) }}--}}
@@ -63,15 +63,15 @@
                                         <td nowrap="nowrap">{{ expandStudentName($registeredStudent->regno) }}</td>
                                         <td>{{ $registeredStudent->regno }}</td>
                                         <td class="text-center">
-                                            {{-- */$cur = getCurrentUnits($registeredStudent->regno, true);/* --}}
+                                            {{-- */$cur = getCurrentUnits($registeredStudent->regno, true, false, $sessionId, $semesterId);/* --}}
                                             {{ $cur }}
                                         </td>
                                         <td class="text-center">
-                                            {{-- */$cue = getCurrentUnits($registeredStudent->regno, false, true);/* --}}
+                                            {{-- */$cue = getCurrentUnits($registeredStudent->regno, false, true, $sessionId, $semesterId);/* --}}
                                             {{ $cue }}
                                         </td>
                                         <td class="text-center">
-                                            {{-- */$wgp = getWeightedGradePoint($registeredStudent->regno);/* --}}
+                                            {{-- */$wgp = getWeightedGradePoint($registeredStudent->regno, false, $sessionId, $semesterId);/* --}}
                                             {{ $wgp }}
                                         </td>
                                         <td class="text-center">
