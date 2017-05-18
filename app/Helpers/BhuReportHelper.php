@@ -84,12 +84,21 @@ function manageAdminDetailedResultsReports($deptId, $sessionId, $semesterId, $le
     if($deptId == 'MIC') { $deptId = 'BIOS'; }
 
     $courses = [];
+    $studentsInLevels = [];
+
     $studentsInLevel = studentsInDepartmentLevel($deptId, $levelId);
+    if($studentsInLevel){
+        foreach ($studentsInLevel as $studentIl) {
+            if(hasStudentRegisteredAnyCourseInSessionSemester($studentIl->regno, $sessionId, $semesterId)){
+                $studentsInLevels[] = $studentIl;
+            }
+        }
+    }
 
     if($regCourses != false){
         // Get Courses Registered for Session and Semester
-        if(count($studentsInLevel) > 0){
-            foreach ($studentsInLevel as $student) {
+        if(count($studentsInLevels) > 0){
+            foreach ($studentsInLevels as $student) {
                 $sessionSemesterCourses = coursesRegisteredByStudentForSessionSemester($student->regno, $sessionId, $semesterId);
                 if(count($sessionSemesterCourses) > 0) {
                     foreach ($sessionSemesterCourses as $sessionSemesterCourse) {
@@ -104,7 +113,7 @@ function manageAdminDetailedResultsReports($deptId, $sessionId, $semesterId, $le
         return $courses;
     } else {
         // Get Students in level in department
-        return $studentsInLevel;
+        return $studentsInLevels;
     }
 
 }
@@ -624,4 +633,12 @@ function getStudentSessionList($studentId) {
 function getYearFromSessionString($sessionId){
     $session = explode('/',$sessionId);
     return $session[0];
+}
+
+function hasStudentRegisteredAnyCourseInSessionSemester($studentId, $sessionId, $semesterId){
+    return DB::connection('mysql2')->table('course_registration')
+                        ->where('students_student_id', $studentId)
+                        ->where('sessions_session_id', $sessionId)
+                        ->where('semester', $semesterId)
+                        ->exists();
 }
