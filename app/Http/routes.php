@@ -78,4 +78,4 @@ Route::post('/admin/login', ['as' => 'admin.post_login', 'uses' => 'BhuAdminCont
 Route::post('/register', ['as' => 'post.register', 'uses' => 'BhuLoginController@postRegister']);
 
 //Route::get('/demo',['as' => 'get.demo', 'uses' => 'BhuAdminController@getDemo']);
-Route::get('/biodata_update',['as' => 'get.demo', 'uses' => 'BhuAdminController@getBiodataUpdate']);
+//Route::get('/biodata_update',['as' => 'get.demo', 'uses' => 'BhuAdminController@getBiodataUpdate']);
