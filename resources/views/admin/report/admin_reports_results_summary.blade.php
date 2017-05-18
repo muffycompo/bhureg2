@@ -55,6 +55,9 @@
                                                 <th class="text-center">Unit</th>
                                                 @foreach($registeredStudents as $student)
                                                     {{-- */$maxWidth[] = sizeof($registeredStudents);/* --}}
+                                                    @if(! hasStudentRegisteredAnyCourseInSessionSemester($student->regno, $sessionId, $semesterId))
+                                                    {{-- */$notRegisteredArray[] = $student->regno;/* --}}
+                                                    @endif
                                                 @endforeach
                                             </tr>
                                             @if(count($headerCourses) > 0)
@@ -145,11 +148,12 @@
                                         <td class="text-center"></td>
                                     </tr>
                                     <tr>
-                                        {{-- */$totalCandidatesExamined = count($registeredStudents);/* --}}
+                                        {{-- */$totalCandidatesExamined = count($registeredStudents) - count($notRegisteredArray);/* --}}
+                                        {{-- */$totalCandidatesExaminedPercent = ($totalCandidatesExamined / $totalCandidates) * 100;/* --}}
                                         <td>Total No. of Candidates Examined</td>
                                         <td class="text-center">=</td>
-                                        <td class="text-center">{{ $totalCandidates }}</td>
-                                        <td class="text-center">100%</td>
+                                        <td class="text-center">{{ $totalCandidatesExamined }}</td>
+                                        <td class="text-center">{{ round($totalCandidatesExaminedPercent) }}%</td>
                                     </tr>
                                     <tr>
                                         {{-- */$carryOver = 0;/* --}}
@@ -174,8 +178,8 @@
                                         <td class="text-center">{{ round($carryOverPercent) }}%</td>
                                     </tr>
                                     <tr>
-                                        {{-- */$notRegistered = $totalCandidates - $totalCandidatesExamined;/* --}}
-                                        {{-- */$notRegisteredPercent = ($notRegistered / $totalCandidatesExamined) * 100;/* --}}
+                                        {{-- */$notRegistered = count($notRegisteredArray);/* --}}
+                                        {{-- */$notRegisteredPercent = ($notRegistered / $totalCandidates) * 100;/* --}}
                                         <td>Total No. of Candidates NOT Registered</td>
                                         <td class="text-center">=</td>
                                         <td class="text-center">{{ $notRegistered }}</td>

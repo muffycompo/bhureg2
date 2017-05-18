@@ -87,18 +87,21 @@ function manageAdminDetailedResultsReports($deptId, $sessionId, $semesterId, $le
     $studentsInLevels = [];
 
     $studentsInLevel = studentsInDepartmentLevel($deptId, $levelId);
-    if($studentsInLevel){
-        foreach ($studentsInLevel as $studentIl) {
-            if(hasStudentRegisteredAnyCourseInSessionSemester($studentIl->regno, $sessionId, $semesterId)){
-                $studentsInLevels[] = $studentIl;
-            }
-        }
-    }
+    // Only Students that Registered
+//    if($studentsInLevel){
+//        foreach ($studentsInLevel as $studentIl) {
+//            if(hasStudentRegisteredAnyCourseInSessionSemester($studentIl->regno, $sessionId, $semesterId)){
+//                $studentsInLevels[] = $studentIl;
+//            }
+//        }
+//    }
 
     if($regCourses != false){
         // Get Courses Registered for Session and Semester
-        if(count($studentsInLevels) > 0){
-            foreach ($studentsInLevels as $student) {
+//        if(count($studentsInLevels) > 0){
+//            foreach ($studentsInLevels as $student) {
+        if(count($studentsInLevel) > 0){
+            foreach ($studentsInLevel as $student) {
                 $sessionSemesterCourses = coursesRegisteredByStudentForSessionSemester($student->regno, $sessionId, $semesterId);
                 if(count($sessionSemesterCourses) > 0) {
                     foreach ($sessionSemesterCourses as $sessionSemesterCourse) {
@@ -113,7 +116,8 @@ function manageAdminDetailedResultsReports($deptId, $sessionId, $semesterId, $le
         return $courses;
     } else {
         // Get Students in level in department
-        return $studentsInLevels;
+//        return $studentsInLevels;
+        return $studentsInLevel;
     }
 
 }
@@ -141,6 +145,8 @@ function studentsInDepartmentLevel($deptId, $levelId){
     return DB::connection('mysql')->table('studentbiodata')
         ->where('deptid', $deptId)
         ->where('levelid', $levelId)
+        ->where('regno', 'LIKE', 'BHU/%')
+        ->whereIn('grad_status', ['N', 'C'])
         ->orderBy('regno')
         ->get(['regno', 'firstname', 'surname']);
 }

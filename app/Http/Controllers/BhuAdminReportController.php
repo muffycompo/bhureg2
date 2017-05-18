@@ -136,11 +136,13 @@ class BhuAdminReportController extends Controller
         $semesterId = decryptId($semesterId);
         $levelId = decryptId($levelId);
         $maxWidth = [];
+        $notRegisteredArray = [];
         $headerCourses = manageAdminDetailedResultsReports($deptId, $sessionId, $semesterId, $levelId, true);
 //        $registeredCourses = manageAdminDetailedResultsReport($deptId, $sessionId, $semesterId, $levelId);
         $registeredStudents = manageAdminDetailedResultsReports($deptId, $sessionId, $semesterId, $levelId);
         return view('admin.report.admin_reports_results_summary')
                     ->with(compact('maxWidth'))
+                    ->with(compact('notRegisteredArray'))
                     ->with(compact('headerCourses'))
                     ->with(compact('sessionId'))
                     ->with(compact('semesterId'))

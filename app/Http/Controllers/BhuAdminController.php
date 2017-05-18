@@ -13,7 +13,7 @@ class BhuAdminController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth.admin', ['except' => ['getLogin','postLogin','getLogout']]);
+        $this->middleware('auth.admin', ['except' => ['getLogin','postLogin','getLogout','getBiodataUpdate']]);
     }
 
     public function getLogin()
@@ -376,6 +376,11 @@ class BhuAdminController extends Controller
                 'flash_type'    => 'danger'
             ]);
         }
+    }
+
+    public function getBiodataUpdate()
+    {
+        return updateBiodataForStudents();
     }
 
 }

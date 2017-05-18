@@ -909,6 +909,7 @@ function departmentFromLecturerId($lecturerId){
         ->first(['departments_department_id']);
     return $lecturer ? $lecturer->departments_department_id : null;
 }
+
 function levelFromSessionCourses($courseId, $session, $semester, $program){
     if($program == 'BIOS') { $program = 'MCB'; }
     if($program == 'MED') { $program = 'MBBS'; }
@@ -920,4 +921,29 @@ function levelFromSessionCourses($courseId, $session, $semester, $program){
         ->where('course_program', $program)
         ->first(['course_level']);
     return $courseLevel ? $courseLevel->course_level : null;
+}
+
+function updateBiodataForStudents(){
+    // Get Student records to update from dreamz.students table
+    $dreamsStudents = DB::connection('mysql2')->table('students')
+                                ->get(['student_id','current_level', 'graduate_status','student_program']);
+    if($dreamsStudents){
+        foreach ($dreamsStudents as $dreamsStudent) {
+            $deptId = $dreamsStudent->student_program;
+
+            if($deptId == 'MCB') { $deptId = 'MIC'; }
+            if($deptId == 'MBBS_CLI') { $deptId = 'MBBS'; }
+            if($deptId == 'PSY_MBBS') { $deptId = 'PHS'; }
+            if($deptId == 'ANA_MBBS') { $deptId = 'ANA'; }
+
+            // Update Student records in bingham.studentbiodata table
+            DB::connection('mysql')->table('studentbiodata')
+                                ->where('regno', $dreamsStudent->student_id)
+                                ->update([
+                                    'levelid' => $dreamsStudent->current_level,
+                                    'grad_status' => $dreamsStudent->graduate_status,
+                                    'deptid' => $deptId,
+                                ]);
+        }
+    }
 }
