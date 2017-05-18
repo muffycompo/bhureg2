@@ -77,7 +77,7 @@
                         <div class="col-md-12 col-xs-12">
                             <div class="panel panel-default panel-custom-bg">
                                 <div class="panel-heading text-center">
-                                    <strong>Registered Courses for {{ currentAcademicSession() }} Session, First Semester</strong>
+                                    <strong>Registered Courses for {{ currentAcademicSession() }} Session, {{ expandSemester(currentSemester()) }} Semester</strong>
                                 </div>
                                 <div class="panel-body">
                                     <table class="table table-condensed table-bordered text-center panel-table-custom">

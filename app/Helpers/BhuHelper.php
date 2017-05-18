@@ -41,7 +41,7 @@ function recommendedDepartmentalCourses($deptId, $levelId, $semester = null, $se
 
 }
 
-function carryOverCourses($regno, $semester = null){
+function carryOverCoursesRemark($regno, $sessionId){
     // Set fetch type to Associative Arrays
     DB::connection('mysql2')->setFetchMode(PDO::FETCH_ASSOC);
 
@@ -52,10 +52,76 @@ function carryOverCourses($regno, $semester = null){
     $courses = DB::connection('mysql2')->table('course_registration')
             ->select(DB::raw('*,(ca + exam) AS total_score'))
             ->where('approval_status','Senate')
-            ->where('students_student_id',$regno);
-    if(!is_null($semester)) {
-        is_array($semester) ? $courses->whereIn('semester', $semester) : $courses->where('semester',$semester);
+            ->where('sessions_session_id',$sessionId)
+            ->where('students_student_id',$regno)
+            ->whereIn('semester',[1,3]); // Only First and Second Semester Carry Overs
+//            ->where('semester',$semester);
+//    if(!is_null($semester)) {
+//        is_array($semester) ? $courses->whereIn('semester', $semester) : $courses->where('semester',$semester);
+//    }
+
+    if($courses = $courses->get()){
+        // Rebuild Result Array
+        foreach($courses as $course) {
+            $skippedSession = studentSkippedSessions($course['students_student_id'], $course['sessions_session_id']);
+            if(! $skippedSession){
+                $courseId = $course['courses_course_id'];
+                if (!isset($processCoursesScore[$courseId])) {
+                    $processCoursesScore[$courseId] = $course;
+                    $processCoursesScore[$courseId]['total_score'] = [];
+                }
+                $processCoursesScore[$courseId]['total_score'][] = $course['total_score'];
+            }
+
+        }
+
+        // Check if a course has not been passed by Student
+        // 45 Passmark for BHU/12 and above
+        // Few Exceptions for Spill-Over students
+        // A case of a student (BHU/11/02/02/0039) which have passed during 2013/2014 using Old standard
+
+        foreach ($processCoursesScore as $score) {
+            // 40 Passmark for BHU/11 and below
+            if($score['sessions_session_id'] == '2009/2010' or
+                $score['sessions_session_id'] == '2010/2011' or
+                $score['sessions_session_id'] == '2011/2012' or
+                ($score['sessions_session_id'] == '2013/2014') && str_contains($score['students_student_id'],'BHU/11')){
+                if(max($score['total_score']) < 40){
+                    $results[$score['courses_course_id']] = $score;
+                }
+            } else {
+                if(max($score['total_score']) < 45){
+                    $results[$score['courses_course_id']] = $score;
+                }
+            }
+
+        }
+
     }
+
+    // Reset fetch type to Object
+    DB::connection('mysql2')->setFetchMode(PDO::FETCH_OBJ);
+
+    return $results;
+}
+
+function carryOverCourses($regno, $sessionId){
+    // Set fetch type to Associative Arrays
+    DB::connection('mysql2')->setFetchMode(PDO::FETCH_ASSOC);
+
+    $processCoursesScore = [];
+
+    $results = [];
+
+    $courses = DB::connection('mysql2')->table('course_registration')
+            ->select(DB::raw('*,(ca + exam) AS total_score'))
+            ->where('approval_status','Senate')
+            ->where('sessions_session_id',$sessionId)
+            ->where('students_student_id',$regno);
+//            ->where('semester',$semester);
+//    if(!is_null($semester)) {
+//        is_array($semester) ? $courses->whereIn('semester', $semester) : $courses->where('semester',$semester);
+//    }
 
     if($courses = $courses->get()){
         // Rebuild Result Array
@@ -142,9 +208,11 @@ function expandLevel($levelId){
 
 function expandProgram($deptId){
     if($deptId == 'MED' or $deptId == 'MBBS') return 'Medicine & Surgery';
-    if($deptId == 'MIC') return 'Biological Sciences';
-    $programs = DB::connection('mysql2')->table('departments')->where('department_id', $deptId)->first();
-    return $programs->department_name;
+    if($deptId == 'MIC' or $deptId == 'BIOS') return 'Microbiology';
+//    $programs = DB::connection('mysql2')->table('programs')->where('department_id', $deptId)->first();
+    $programs = DB::connection('mysql2')->table('programs')->where('program_id', $deptId)->first();
+//    return $programs->department_name;
+    return $programs->program_name;
 }
 
 function expandCourseType($courseId){
@@ -196,7 +264,7 @@ function lecturerAssignedCourses($userId, $session = '2016/2017'){
     return $courses;
 };
 
-function lecturerManageCourseResult($courseId, $session = '2016/2017', $semester = 1){
+function lecturerManageCourseResult($courseId, $session, $semester){
     $courses = DB::connection('mysql2')->table('course_registration')
                     ->where('sessions_session_id', $session)
                     ->where('semester', $semester)
@@ -209,26 +277,132 @@ function lecturerManageCourseResult($courseId, $session = '2016/2017', $semester
 function isCourseResultFinalized($courseId){
     $session = currentAcademicSession();
     $semester = currentSemester();
-    $role = session('role');
-    $approval = checkApprovalStatus($role,$courseId,$session, $semester);
-    if($role == 'Lecturer' && $approval) return false;
-    if($role == 'HOD' && $approval) return false;
-    if($role == 'Dean' && $approval) return false;
-    if($role == 'Senate' && $approval) return false;
-    return true;
+//    $role = session('role');
+
+    $finalize = DB::connection('mysql2')->table('course_registration')
+                        ->where('courses_course_id',$courseId)
+                        ->where('sessions_session_id',$session)
+                        ->where('semester',$semester)
+                        ->whereIn('approval_status',['Lecturer','HOD','Dean','Senate'])
+                        ->exists();
+    return $finalize;
 }
 
-function finalizeCourseResult($userId, $courseId, $session, $type){
+function isCourseResultFinalizedByHod($courseId, $session = null){
+    $session = is_null($session) ? currentAcademicSession() : $session;
     $semester = currentSemester();
-    DB::connection('mysql2')->table('courses_lecturers')
-                    ->where('users_user_id', $userId)
-                    ->where('semester', $semester)
-                    ->where('sessions_session_id', $session)
-                    ->where('courses_course_id', $courseId)
-                    ->where('final_submission', 1)
-                    ->update(['final_submission' => 1]);
+    $userId = lecturerIdFromCourse($courseId, $session);
+
+    $finalizeCourses = DB::connection('mysql2')->table('course_registration')
+                        ->where('courses_course_id',$courseId)
+                        ->where('sessions_session_id',$session)
+                        ->where('semester',$semester)
+                        ->where('approval_status','HOD')
+                        ->exists();
+
+    $finalizeHodCourses = DB::connection('mysql2')->table('courses_lecturers')
+                        ->where('courses_course_id',$courseId)
+                        ->where('sessions_session_id',$session)
+                        ->where('users_user_id',$userId)
+                        ->where('final_submission', 1)
+                        ->exists();
+
+    return $finalizeCourses && $finalizeHodCourses ? true : false;
+}
+
+function finalizeCourseResult($courseId, $session, $type){
+    $semester = currentSemester();
+    $userId = session('role') == 'Lecturer' ? session('user_id') : lecturerIdFromCourse($courseId,$session);
+    if($type == 'HOD'){
+        DB::connection('mysql2')->table('courses_lecturers')
+            ->where('users_user_id', $userId)
+            ->where('sessions_session_id', $session)
+            ->where('courses_course_id', $courseId)
+            ->update(['final_submission' => 1, 'semester' => $semester]);
+    }
+
+    if($type != 'Lecturer'){
+        return updateApprovalStatus($type,$courseId, $semester, $session, $userId);
+    }
 
     return updateApprovalStatus($type,$courseId, $semester, $session);
+}
+
+function levelApprovalStatus($deptId, $session, $semester, $level, $onlyApproval = false){
+    if($deptId == 'BIOS') { $deptId = 'MCB'; }
+    if($deptId == 'MED') { $deptId = 'MBBS'; }
+
+    $approval = DB::connection('mysql2')->table('session_courses_approvals')
+                    ->where('program', $deptId)
+                    ->where('session_id', $session)
+                    ->where('semester_id', $semester)
+                    ->where('level_approved', $level)
+                    ->first(['approval']);
+    if($onlyApproval){ return $approval ? $approval->approval : null; }
+    return $approval ? 'APPROVAL LEVEL: ' . changeStringToUpperCase($approval->approval) : 'APPROVAL LEVEL: NOT APPROVED';
+
+}
+
+function finalizeResultReport($deptId, $session, $semester, $level){
+    $role = session('role');
+
+    if($deptId == 'BIOS') { $deptId = 'MCB'; }
+    if($deptId == 'MED') { $deptId = 'MBBS'; }
+
+    $check = DB::connection('mysql2')->table('session_courses_approvals')
+                    ->where('program', $deptId)
+                    ->where('session_id', $session)
+                    ->where('semester_id', $semester)
+                    ->where('level_approved', $level)
+                    ->exists();
+
+    if($check){
+        DB::connection('mysql2')->table('session_courses_approvals')
+                    ->where('program', $deptId)
+                    ->where('session_id', $session)
+                    ->where('semester_id', $semester)
+                    ->where('level_approved', $level)
+                    ->update(['approval' => $role]);
+    } else {
+        DB::connection('mysql2')->table('session_courses_approvals')
+                    ->where('program', $deptId)
+                    ->where('session_id', $session)
+                    ->where('semester_id', $semester)
+                    ->where('level_approved', $level)
+                    ->insert([
+                        'approval' => $role,
+                        'program' => $deptId,
+                        'session_id' => $session,
+                        'semester_id' => $semester,
+                        'level_approved' => $level,
+                    ]);
+    }
+
+    // Update Approval for Session and Semester
+    $registeredStudents = manageAdminDetailedResultsReports($deptId, $session, $semester, $level);
+    if($registeredStudents){
+        $whereStudents = [];
+        foreach ($registeredStudents as $registeredStudent) {
+            if(isRegistered($registeredStudent->regno, $session, $semester)){
+                $whereStudents[] = $registeredStudent->regno;
+            }
+        }
+        DB::connection('mysql2')->table('course_registration')
+            ->where('sessions_session_id', $session)
+            ->where('semester', $semester)
+            ->whereIn('students_student_id', $whereStudents)
+            ->update(['approval_status' => $role]);
+
+    }
+}
+
+function isRegistered($studentId, $sessionId, $semesterId){
+//    select * FROM course_registration WHERE sessions_session_id = '2016/2017' AND semester = 1 AND students_student_id = 'BHU/15/04/05/0089'
+    return DB::connection('mysql2')->table('course_registration')
+                        ->where('students_student_id', $studentId)
+                        ->where('sessions_session_id', $sessionId)
+                        ->where('semester', $semesterId)
+                        ->exists();
 }
 
 function hodDepartmentCourses($deptId, $session){
@@ -255,11 +429,19 @@ function hodAddDepartmentCourses($deptId, $level, $semester){
     return $courses;
 }
 
-function departmentDropdownOptions(){
+function departmentDropdownOptions()
+{
     $options = [];
 
-    $departments = DB::connection('mysql2')->table('departments')->get(['department_id','department_name']);
-
+    if (session('role') == 'Dean'){
+        $deanDeptId = session('departments_department_id');
+        $likeDeptId = substr($deanDeptId,0,3);
+        $departments = DB::connection('mysql2')->table('departments')
+            ->where('faculty_faculty_id','LIKE', $likeDeptId . '%')
+            ->get(['department_id', 'department_name']);
+    } else {
+        $departments = DB::connection('mysql2')->table('departments')->get(['department_id', 'department_name']);
+    }
     foreach ($departments as $department){
         if($department->department_id == 'ALL' || $department->department_id == 'HSMS_Result'
             || $department->department_id == 'MED_Result'|| $department->department_id == 'SCIT_Result') continue;
@@ -315,13 +497,34 @@ function departmentalCourses($deptId, $session){
     return $courses;
 }
 
+//function searchCourses($deptId, $session, $semester, $levelId){
 function searchCourses($deptId, $semester, $levelId){
+//    $searchCourses = [];
     $courses = DB::connection('mysql2')->table('courses')
                     ->where('departments_department_id', $deptId)
                     ->where('semester', $semester)
                     ->where('course_level', $levelId)
                     ->get();
     return $courses;
+//    if($courses) {
+//        foreach ($courses as $course) {
+//            if(lecturerHasFinalized($course->course_id,$session, $semester)){
+//                $searchCourses[] = $course;
+//            }
+//        }
+//    }
+////    return $courses;
+//    dd($searchCourses);
+//    return $searchCourses;
+}
+
+function lecturerHasFinalized($courseId, $session, $semester){
+    return DB::connection('mysql2')->table('course_registration')
+                ->where('sessions_session_id', $session)
+                ->where('courses_course_id', $courseId)
+                ->where('semester', $semester)
+                ->where('approval_status', 'Lecturer')
+                ->exists();
 }
 
 function expandGrade($score, $oldGrade = false, $point = false){
@@ -467,6 +670,15 @@ function assignedLecturerCourses($deptId){
         ->paginate(25);
 }
 
+function hodDepartmentLecturers($deptId){
+    $lecturers = DB::connection('mysql2')->table('users')
+                    ->where('departments_department_id', $deptId)
+                    ->orderBy('first_name')
+                    ->get(['user_id','first_name','last_name','departments_department_id']);
+    return json_encode($lecturers);
+
+}
+
 function hodAssignCourseToLecturer($userId, $semester, $session, $courses){
     if(count($courses) > 0){
         $insertArray = [];
@@ -537,7 +749,42 @@ function currentSemester(){
     return $semester ? $semester->utility_int_value : 1;
 }
 
-function updateApprovalStatus($type, $courseId, $semester, $session){
+function updateSessionApprovalStatus($levelId, $semester, $session){
+    $role = session('role');
+    $deptId = session('departments_department_id');
+
+    if($deptId == 'MED') { $deptId = 'MBBS'; }
+    if($deptId == 'BIOS') { $deptId = 'MCB'; }
+
+    $sessionApproval = DB::connection('mysql2')->table('session_courses_approvals')
+        ->where('session_id', $session)
+        ->where('semester_id', $semester)
+        ->where('program', $deptId)
+        ->where('approval', $role)
+        ->where('level_approved', $levelId)
+        ->exits();
+    if($sessionApproval){
+        return DB::connection('mysql2')->table('session_courses_approvals')
+            ->where('session_id', $session)
+            ->where('semester_id', $semester)
+            ->where('program', $deptId)
+            ->where('level_approved', $levelId)
+            ->update(['approval' => $role ]);
+    } else {
+        return DB::connection('mysql2')->table('session_courses_approvals')
+            ->insert([
+                'session_id' => $session,
+                'semester_id' => $semester,
+                'program' => $deptId,
+                'level_approved' => $levelId,
+                'approval' => $role
+            ]);
+    }
+}
+
+function updateApprovalStatus($type, $courseId, $semester, $session, $userId = null){
+    //$type = session('role');
+
     $updateApprovalStatus = DB::connection('mysql2')->table('course_registration')
         ->where('semester', $semester)
         ->where('sessions_session_id', $session)
@@ -545,6 +792,36 @@ function updateApprovalStatus($type, $courseId, $semester, $session){
         ->update(['approval_status' => $type]);
 
     return $updateApprovalStatus ? true : false;
+}
+
+function updateApprovalStatusReport($deptId, $semester, $session, $level){
+        $type = session('role');
+
+        if($deptId == 'BIOS') { $deptId = 'MCB'; }
+        if($deptId == 'MED') { $deptId = 'MBBS'; }
+
+        $sessionApproval = DB::connection('mysql2')->table('session_courses_approvals')
+            ->where('semester_id', $semester)
+            ->where('session_id', $session)
+            ->where('program', $deptId)
+            ->where('level_approved', $level)
+            ->exists();
+        if($sessionApproval){
+            DB::connection('mysql2')->table('session_courses_approvals')
+                ->where('semester_id', $semester)
+                ->where('session_id', $session)
+                ->where('program', $deptId)
+                ->where('level_approved', $level)
+                ->update(['approval' => $type]);
+        } else {
+            DB::connection('mysql2')->table('session_courses_approvals')->insert([
+                    'semester_id' => $semester,
+                    'session_id' => $session,
+                    'program' => $deptId,
+                    'level_approved' => $level,
+                    'approval' => $type,
+                ]);
+        }
 }
 
 function checkApprovalStatus($type, $courseId,$session,$semester){
@@ -585,4 +862,62 @@ function maxRegistrationUnits(){
                 ->where('utility_id','max_credit_units')
                 ->first(['utility_int_value']);
     return $units ? $units->utility_int_value : 30;
+}
+
+function resultSessionDropdownOptions(){
+    $regno = session('regno');
+    $sessionOptions = [];
+    $sessions = DB::connection('mysql2')->table('course_registration')
+                    ->where('students_student_id', $regno)
+                    ->where('approval_status', 'Senate')
+                    ->orderBy('sessions_session_id','DESC')
+                    ->groupBy('sessions_session_id')
+                    ->lists('sessions_session_id');
+    foreach ($sessions as $session) {
+        $sessionOptions[$session] = $session;
+    }
+
+    return $sessionOptions;
+}
+
+function getClassOfDegree($cgpa){
+
+    if($cgpa >= 4.5){
+        return 'First Class';
+    } elseif ($cgpa >= 3.5 && $cgpa <=4.49){
+        return 'Second Class (Upper)';
+    } elseif ($cgpa >= 2.45 && $cgpa <=3.49){
+        return 'Second Class (Lower)';
+    } else {
+        return 'Third Class';
+    }
+
+    return '';
+}
+
+function lecturerIdFromCourse($courseId, $sessionId){
+    $lecturer = DB::connection('mysql2')->table('courses_lecturers')
+                    ->where('courses_course_id', $courseId)
+                    ->where('sessions_session_id', $sessionId)
+                    ->first(['users_user_id']);
+    return $lecturer ? $lecturer->users_user_id : null;
+}
+
+function departmentFromLecturerId($lecturerId){
+    $lecturer = DB::connection('mysql2')->table('users')
+        ->where('user_id', $lecturerId)
+        ->first(['departments_department_id']);
+    return $lecturer ? $lecturer->departments_department_id : null;
+}
+function levelFromSessionCourses($courseId, $session, $semester, $program){
+    if($program == 'BIOS') { $program = 'MCB'; }
+    if($program == 'MED') { $program = 'MBBS'; }
+
+    $courseLevel = DB::connection('mysql2')->table('department_courses')
+        ->where('courses_course_id', $courseId)
+        ->where('session_session_id', $session)
+        ->where('semester', $semester)
+        ->where('course_program', $program)
+        ->first(['course_level']);
+    return $courseLevel ? $courseLevel->course_level : null;
 }

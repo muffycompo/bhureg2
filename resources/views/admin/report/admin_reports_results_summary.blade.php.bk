@@ -25,8 +25,7 @@
                         {{ expandLevel($levelId) }} LEVEL (SUMMARY PAGE)<br>
                         {{ changeStringToUpperCase(expandSemester($semesterId)) }} SEMESTER {{ $sessionId }} ACADEMIC SESSION<br>
                         {{ departmentalDegreeTitle($deptId) }}<br>
-                        {{-- */$approval = levelApprovalStatus($deptId, $sessionId, $semesterId, $levelId, true);/* --}}
-                        {{ levelApprovalStatus($deptId, $sessionId, $semesterId, $levelId) }}
+                        {{--APPROVAL LEVEL: {{ changeStringToUpperCase(session('role')) }}--}}
                     </strong>
                 </h3>
             </div>
@@ -34,9 +33,6 @@
                 <div class="row">
                     <div class="col-md-12 col-xs-12">
                         <p class="text-right hidden-print">
-                            @if((is_null($approval) && session('role') == 'HOD') or ($approval == 'HOD' && (session('role') == 'Dean' or session('role') == 'Senate')) or ($approval == 'Dean' && (session('role') == 'Senate')) )
-                                <a href="{{ route('admin.report_finalize_level_result',[encryptId($deptId), encryptId($sessionId), encryptId($semesterId), encryptId($levelId)]) }}" class="btn btn-success">Finalize Result</a>
-                            @endif
                             <a href="javascript:;" onclick="window.print();" class="btn btn-primary"><span class="glyphicon glyphicon-print"></span> Print</a>
                             <a href="{{ route('admin.get_detailed_reports') }}" class="btn btn-danger">Back</a>
                         </p>
@@ -44,7 +40,7 @@
                             <div class="col-md-8 col-xs-8">
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-condensed">
-                                        @if(count($registeredStudents) > 0)
+                                        @if(count($registeredCourses) > 0)
                                             <tr>
                                                 <th class="text-center" colspan="4">A<br>Courses</th>
                                             </tr>
@@ -53,18 +49,23 @@
                                                 <th class="text-center">Course ID</th>
                                                 <th class="text-center">Title</th>
                                                 <th class="text-center">Unit</th>
-                                                @foreach($registeredStudents as $student)
-                                                    {{-- */$maxWidth[] = sizeof($registeredStudents);/* --}}
+                                                @foreach($registeredCourses as $courses)
+                                                    {{-- */$maxWidth[] = sizeof($courses);/* --}}
+                                                    @foreach($courses as $course)
+                                                        @if(! array_key_exists($course->courses_course_id,$headerCourses))
+                                                            {{-- */$headerCourses[$course->courses_course_id] = $course;/* --}}
+                                                        @endif
+                                                    @endforeach
                                                 @endforeach
                                             </tr>
                                             @if(count($headerCourses) > 0)
 
-                                                @foreach($headerCourses as $course)
+                                                @foreach($headerCourses as $course_id => $value)
                                                     <tr class="text-center">
                                                         <td>{{ $sn++ }}</td>
-                                                        <td>{{ $course }}</td>
-                                                        <td>{{ courseTitleAndUnits($course) }}</td>
-                                                        <td>{{ courseTitleAndUnits($course, true) }}</td>
+                                                        <td>{{ $course_id }}</td>
+                                                        <td>{{ courseTitleAndUnits($course_id) }}</td>
+                                                        <td>{{ courseTitleAndUnits($course_id, true) }}</td>
                                                     </tr>
                                                 @endforeach
 
@@ -138,14 +139,14 @@
                                         <th class="text-center" colspan="4">C<br>Summary</th>
                                     </tr>
                                     <tr>
-                                        {{-- */$totalCandidates = count($registeredStudents);/* --}}
+                                        {{-- */$totalCandidates = count($registeredCourses);/* --}}
                                         <td>Total No. of Candidates</td>
                                         <td class="text-center">=</td>
-                                        <td class="text-center">{{ count($registeredStudents) }}</td>
+                                        <td class="text-center">{{ count($registeredCourses) }}</td>
                                         <td class="text-center"></td>
                                     </tr>
                                     <tr>
-                                        {{-- */$totalCandidatesExamined = count($registeredStudents);/* --}}
+                                        {{-- */$totalCandidatesExamined = count($registeredCourses);/* --}}
                                         <td>Total No. of Candidates Examined</td>
                                         <td class="text-center">=</td>
                                         <td class="text-center">{{ $totalCandidates }}</td>
@@ -153,9 +154,9 @@
                                     </tr>
                                     <tr>
                                         {{-- */$carryOver = 0;/* --}}
-                                        @if(count($registeredStudents) > 0)
-                                            @foreach($registeredStudents as $student)
-                                                {{-- */$NoOfCo = getSummaryCarryOversPass($student->regno, $sessionId);/* --}}
+                                        @if(count($registeredCourses) > 0)
+                                            @foreach($registeredCourses as $course => $data)
+                                                {{-- */$NoOfCo = getSummaryCarryOversPass($course);/* --}}
                                                 {{-- */$carryOver = $carryOver + $NoOfCo;/* --}}
                                             @endforeach
                                         @endif

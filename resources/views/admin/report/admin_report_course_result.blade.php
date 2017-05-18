@@ -12,6 +12,14 @@
                     <div class="row hidden-print">
                         <div class="col-md-6"><p>Manage Results</p></div>
                         <div class="col-md-6 text-right">
+                            @if(! isCourseResultFinalizedByHod($course_id))
+                                {{-- */$lecturerId = lecturerIdFromCourse($course_id, $session_id);/* --}}
+                                @if(! is_null($lecturerId))
+                                    <a href="{{ route('admin.hod_manage_result_adjustment',[encryptId($course_id),encryptId($lecturerId),$semester_id]) }}" class="btn btn-danger">
+                                        <span class="glyphicon glyphicon-edit"></span> Adjust Result
+                                    </a>
+                                @endif
+                            @endif
                             <a href="javascript:;" onclick="window.print();" class="btn btn-primary"><span class="glyphicon glyphicon-print"></span> Print</a>
                             {{--@if(request()->segment(2) == 'manage_find_submission')--}}
                                 {{--<a href="{{ redirect()->back()->getTargetUrl() }}" class="btn btn-danger"><span class="glyphicon glyphicon-backward"></span> Back</a>--}}
@@ -25,11 +33,11 @@
 
                 <div class="panel-body">
                     <p><strong>Course: {{ $course_id }} - {{ courseTitleAndUnits($course_id) }}
-                            @if(! isCourseResultApprovedByDeanSenate($course_id, $session_id, $semester_id))
-                                <span class="text-danger">-> [RESULT NOT APPROVED BY {{ changeStringToUpperCase(session('role')) }}]</span>
-                            @else
-                                <span class="text-success">-> [RESULT APPROVED]</span>
-                            @endif
+                            {{--@if(! isCourseResultApprovedByDeanSenate($course_id, $session_id, $semester_id))--}}
+                                {{--<span class="text-danger">-> [RESULT NOT APPROVED BY {{ changeStringToUpperCase(session('role')) }}]</span>--}}
+                            {{--@else--}}
+                                {{--<span class="text-success">-> [RESULT APPROVED]</span>--}}
+                            {{--@endif--}}
                         </strong></p>
                     <table class="table table-bordered table-condensed">
                         <tr>

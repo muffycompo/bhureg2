@@ -44,6 +44,16 @@ class BhuAdminReportController extends Controller
                 ->with(compact('levelId'));
     }
 
+    public function manageFinalizeLevelResult($deptId, $sessionId, $semesterId, $levelId)
+    {
+        $deptId = decryptId($deptId);
+        $sessionId = decryptId($sessionId);
+        $semesterId = decryptId($semesterId);
+        $levelId = decryptId($levelId);
+        $finalize = finalizeResultReport($deptId, $sessionId, $semesterId, $levelId);
+        return redirect()->back();
+    }
+
     public function manageAdminFindResultSubmission(Request $request)
     {
         $courses = resultsReport($request);
@@ -102,8 +112,12 @@ class BhuAdminReportController extends Controller
         $semesterId = decryptId($semesterId);
         $levelId = decryptId($levelId);
         $maxWidth = [];
-        $headerCourses = [];
-        $registeredCourses = manageAdminDetailedResultsReport($deptId, $sessionId, $semesterId, $levelId);
+//        $headerCourses = headerCourses($deptId, $sessionId, $semesterId, $levelId);
+        $headerCourses = manageAdminDetailedResultsReports($deptId, $sessionId, $semesterId, $levelId, true);
+//        $registeredCourses = manageAdminDetailedResultsReport($deptId, $sessionId, $semesterId, $levelId);
+//        $registeredCourses = manageAdminDetailedResultsReports($deptId, $sessionId, $semesterId, $levelId);
+//        $registeredStudents = manageAdminDetailedResultsReports($deptId, $sessionId, $semesterId, $levelId);
+        $registeredStudents = manageAdminDetailedResultsReports($deptId, $sessionId, $semesterId, $levelId);
         return view('admin.report.admin_reports_results_detail')
                     ->with(compact('maxWidth'))
                     ->with(compact('headerCourses'))
@@ -112,7 +126,7 @@ class BhuAdminReportController extends Controller
                     ->with(compact('levelId'))
                     ->with(compact('deptId'))
                     ->with('sn',1)
-                    ->with(compact('registeredCourses'));
+                    ->with(compact('registeredStudents'));
     }
 
     public function manageAdminSummaryCourseResults($deptId, $sessionId, $semesterId, $levelId)
@@ -122,8 +136,9 @@ class BhuAdminReportController extends Controller
         $semesterId = decryptId($semesterId);
         $levelId = decryptId($levelId);
         $maxWidth = [];
-        $headerCourses = [];
-        $registeredCourses = manageAdminDetailedResultsReport($deptId, $sessionId, $semesterId, $levelId);
+        $headerCourses = manageAdminDetailedResultsReports($deptId, $sessionId, $semesterId, $levelId, true);
+//        $registeredCourses = manageAdminDetailedResultsReport($deptId, $sessionId, $semesterId, $levelId);
+        $registeredStudents = manageAdminDetailedResultsReports($deptId, $sessionId, $semesterId, $levelId);
         return view('admin.report.admin_reports_results_summary')
                     ->with(compact('maxWidth'))
                     ->with(compact('headerCourses'))
@@ -132,7 +147,7 @@ class BhuAdminReportController extends Controller
                     ->with(compact('levelId'))
                     ->with(compact('deptId'))
                     ->with('sn',1)
-                    ->with(compact('registeredCourses'));
+                    ->with(compact('registeredStudents'));
     }
 
     public function manageAdminRemarkCourseResults($deptId, $sessionId, $semesterId, $levelId)
@@ -141,7 +156,8 @@ class BhuAdminReportController extends Controller
         $sessionId = decryptId($sessionId);
         $semesterId = decryptId($semesterId);
         $levelId = decryptId($levelId);
-        $registeredStudents = manageAdminRemarkResultsReport($deptId, $sessionId, $semesterId, $levelId);
+//        $registeredStudents = manageAdminRemarkResultsReport($deptId, $sessionId, $semesterId, $levelId);
+        $registeredStudents = manageAdminDetailedResultsReports($deptId, $sessionId, $semesterId, $levelId);
         return view('admin.report.admin_reports_results_remark')
                     ->with(compact('sessionId'))
                     ->with(compact('semesterId'))

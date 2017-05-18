@@ -17,7 +17,7 @@
                         <div class="col-md-3 col-xs-3">
                             <div class="form-group">
                                 <label for="department_id">Department</label>
-                                {!! Form::select('department_id',['CMP' => 'Computer Science'],$deptId,['class' => 'form-control', 'id' => 'department_id']) !!}
+                                {!! Form::select('department_id',departmentDropdownOptions(),$deptId,['class' => 'form-control', 'id' => 'department_id']) !!}
                             </div>
                         </div>
                          @endif

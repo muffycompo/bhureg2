@@ -25,8 +25,7 @@
                         {{ expandLevel($levelId) }} LEVEL (DETAILED RESULT PAGE)<br>
                         {{ changeStringToUpperCase(expandSemester($semesterId)) }} SEMESTER {{ $sessionId }} ACADEMIC SESSION<br>
                         {{ departmentalDegreeTitle($deptId) }}<br>
-                        {{-- */$approval = levelApprovalStatus($deptId, $sessionId, $semesterId, $levelId, true);/* --}}
-                        {{ levelApprovalStatus($deptId, $sessionId, $semesterId, $levelId) }}
+                        {{--APPROVAL LEVEL: {{ changeStringToUpperCase(session('role')) }}--}}
                     </strong>
                 </h3>
             </div>
@@ -35,39 +34,43 @@
                     <div class="col-md-12 col-xs-12">
                         <div class="table-responsive">
                             <p class="text-right hidden-print">
-                                @if((is_null($approval) && session('role') == 'HOD') or ($approval == 'HOD' && (session('role') == 'Dean' or session('role') == 'Senate')) or ($approval == 'Dean' && (session('role') == 'Senate')) )
-                                    <a href="{{ route('admin.report_finalize_level_result',[encryptId($deptId), encryptId($sessionId), encryptId($semesterId), encryptId($levelId)]) }}" class="btn btn-success">Finalize Result</a>
-                                @endif
                                 <a href="javascript:;" onclick="window.print();" class="btn btn-primary"><span class="glyphicon glyphicon-print"></span> Print</a>
                                 <a href="{{ route('admin.get_detailed_reports') }}" class="btn btn-danger">Back</a>
                             </p>
                             <table class="table table-bordered table-condensed">
-                                @if(count($registeredStudents) > 0)
+                                @if(count($registeredCourses) > 0)
                                     <tr>
                                         <th>S/No</th>
                                         <th>Name</th>
                                         <th>Matric. No</th>
+                                        @foreach($registeredCourses as $courses)
+                                            {{-- */$maxWidth[] = sizeof($courses);/* --}}
+                                            @foreach($courses as $course)
+                                                @if(! array_key_exists($course->courses_course_id,$headerCourses))
+                                                    {{-- */$headerCourses[$course->courses_course_id] = $course;/* --}}
+                                                @endif
+                                            @endforeach
+                                        @endforeach
                                         @if(count($headerCourses) > 0)
-                                            @foreach($headerCourses as $course)
+                                            @foreach($headerCourses as $course_id => $value)
                                                 <th class="text-center">
-                                                    {{ $course }}<br>
-                                                    [{{ courseTitleAndUnits($course, true) }}]<br>
+                                                    {{ $course_id }}<br>
+                                                    [{{ courseTitleAndUnits($course_id, true) }}]<br>
                                                     [S-G-P]
                                                 </th>
                                             @endforeach
                                         @endif
 
                                     </tr>
-                                    @foreach($registeredStudents as $student)
+                                    @foreach($registeredCourses as $regno => $courses)
                                     <tr>
                                         <td>{{ $sn++ }}</td>
-{{--                                        <td nowrap="nowrap">{{ expandStudentName($student) }}</td>--}}
-                                        <td nowrap="nowrap">{{ changeStringToUpperCase($student->surname) . ', ' . changeStringToTitleCase($student->firstname) }}</td>
+                                        <td nowrap="nowrap">{{ expandStudentName($regno) }}</td>
                                         <td>
-                                            {{ $student->regno }}
+                                            {{ $regno }}
                                         </td>
-                                        @foreach($headerCourses as $course)
-                                            <td class="text-center">{{ courseResultStringFormat($student->regno, $course, $sessionId, $semesterId) }}</td>
+                                        @foreach($headerCourses as $course_id => $value)
+                                            <td class="text-center">{{ courseResultStringFormat($regno, $course_id, $sessionId, $semesterId) }}</td>
                                         @endforeach
                                     </tr>
                                     @endforeach

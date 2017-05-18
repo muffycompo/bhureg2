@@ -98,9 +98,8 @@ class BhuAdminController extends Controller
     public function lecturerFinalizeCourseResult($courseId)
     {
         $courseId = decryptId($courseId);
-        $userId = session('user_id');
         $role = session('role');
-        if(finalizeCourseResult($userId,$courseId, currentAcademicSession(),$role)){
+        if(finalizeCourseResult($courseId, currentAcademicSession(),$role)){
             return redirect()->back();
         } else {
             return redirect()->back()->with([
@@ -190,6 +189,13 @@ class BhuAdminController extends Controller
 
     }
 
+    public function hodDepartmentLecturers(Request $request)
+    {
+        $deptId = $request->has('department_id') ? $request->get('department_id') : session('departments_department_id');
+        $lecturers = hodDepartmentLecturers($deptId);
+        return $lecturers;
+    }
+
     public function hodManageUnassignCourse($userId, $courseId, $sessionId)
     {
         $userId = decryptId($userId);
@@ -246,13 +252,17 @@ class BhuAdminController extends Controller
     {
         $courseId = decryptId($courseId);
         $userId = decryptId($userId);
+        $sessionId = currentAcademicSession();
 
-        $courses = lecturerManageCourseResult($courseId, currentAcademicSession(), $semesterId);
+        $courses = lecturerManageCourseResult($courseId, $sessionId, $semesterId);
         return view('admin.hod.hod_manage_course_result')
             ->with(compact('courses'))
             ->with('course_id', $courseId)
+            ->with('session_id', $sessionId)
+            ->with('semester_id', $semesterId)
             ->with('user_id', $userId)
-            ->with('current_nav','manage_adjustments')
+//            ->with('current_nav','manage_adjustments')
+            ->with('current_nav','manage_reports')
             ->with('sn',1);
     }
 
@@ -266,7 +276,9 @@ class BhuAdminController extends Controller
     {
         $deptId = $request->get('department_id');
         $semester = $request->get('semester_id');
+//        $session = $request->get('session_id');
         $levelId = $request->get('level_id');
+//        $courses = searchCourses($deptId, $session, $semester, $levelId);
         $courses = searchCourses($deptId, $semester, $levelId);
         return view('admin.hod.hod_add_course')
             ->with('current_nav','manage_courses')
@@ -327,10 +339,11 @@ class BhuAdminController extends Controller
         $courseId = $request->get('course_id');
         $lecturerId = $request->get('lecturer_id');
 
-        $courseRegistration->saveCourseResultHod($lecturerId, $cas, $exams, $students, $courseId, currentAcademicSession(), currentSemester());
+//        $courseRegistration->saveCourseResultHod($lecturerId, $cas, $exams, $students, $courseId, currentAcademicSession(), currentSemester());
+        $courseRegistration->saveCourseResultHod($cas, $exams, $students, $courseId, currentAcademicSession(), currentSemester());
 
         return redirect()->back()->with([
-            'flash_message' => 'Result for ' . $courseId . ' has been saved Successfully!',
+            'flash_message' => 'Result for ' . $courseId . ' has been adjusted and finalized Successfully!',
             'flash_type'    => 'success'
         ]);
     }

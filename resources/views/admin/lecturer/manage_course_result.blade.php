@@ -6,7 +6,6 @@
         <div class="col-md-10 col-md-offset-1">
 
             @include('bhu._partials._alert')
-
             @if(! isCourseResultFinalized($course_id))
             <div class="panel panel-default">
                 <div class="panel-heading">Bulk Result Upload</div>

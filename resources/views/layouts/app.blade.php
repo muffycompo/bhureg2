@@ -72,16 +72,31 @@
                                     Dashboard
                                 </a>
                             </li>
-                            <li class="{{ isset($current_nav) && $current_nav == 'register_course' ? 'active' : '' }}">
-                                <a href="{{ route('get.register') }}">
+                            <li class="dropdown {{ isset($current_nav) && ($current_nav == 'register_course' or $current_nav == 'print_form') ? 'active' : '' }}">
+                                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                                     <span class="glyphicon glyphicon-th-list"></span>
-                                    Register Courses
+                                    Course Registration <span class="caret"></span>
                                 </a>
+
+                                <ul class="dropdown-menu" role="menu">
+                                    <li class="{{ isset($current_nav) && $current_nav == 'register_course' ? 'active' : '' }}">
+                                        <a href="{{ route('get.register') }}">
+                                            <span class="glyphicon glyphicon-th-list"></span>
+                                            Register Courses
+                                        </a>
+                                    </li>
+                                    <li class="{{ isset($current_nav) && $current_nav == 'print_form' ? 'active' : '' }}">
+                                        <a href="{{ route('get.print_course') }}">
+                                            <span class="glyphicon glyphicon-print"></span>
+                                            Printable Form
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
-                            <li class="{{ isset($current_nav) && $current_nav == 'print_form' ? 'active' : '' }}">
-                                <a href="{{ route('get.print_course') }}">
-                                    <span class="glyphicon glyphicon-print"></span>
-                                    Printable Form
+                            <li class="{{ isset($current_nav) && $current_nav == 'student_results' ? 'active' : '' }}">
+                                <a href="{{ route('get.results') }}">
+                                    <span class="glyphicon glyphicon-list-alt"></span>
+                                    Results
                                 </a>
                             </li>
                             <li class="dropdown">
@@ -126,13 +141,13 @@
                                     Lecturer Management
                                 </a>
                             </li>
-                            <li class="{{ isset($current_nav) && $current_nav == 'manage_adjustments' ? 'active' : '' }}">
+                            {{--<li class="{{ isset($current_nav) && $current_nav == 'manage_adjustments' ? 'active' : '' }}">--}}
                                 {{--HOD's can only make 1 correction to a Course Result--}}
-                                <a href="{{ route('admin.hod_manage_result_adjustments') }}">
-                                    <span class="glyphicon glyphicon-edit"></span>
-                                    Result Adjustment
-                                </a>
-                            </li>
+                                {{--<a href="{{ route('admin.hod_manage_result_adjustments') }}">--}}
+                                    {{--<span class="glyphicon glyphicon-edit"></span>--}}
+                                    {{--Result Adjustment--}}
+                                {{--</a>--}}
+                            {{--</li>--}}
                         @endif
                         <!-- Lecturer: Admin Links -->
                         @if(session()->has('role') && session('role') == 'Lecturer')
@@ -181,12 +196,14 @@
                                 </a>
 
                                 <ul class="dropdown-menu" role="menu">
-                                    <li>
-                                        <a href="{{ route('admin.get_reports') }}">
-                                            <span class="glyphicon glyphicon-check"></span>
-                                            Result Approvals
-                                        </a>
-                                    </li>
+                                    @if(session('role') == 'HOD')
+                                        <li>
+                                            <a href="{{ route('admin.get_reports') }}">
+                                                <span class="glyphicon glyphicon-check"></span>
+                                                Result Submissions
+                                            </a>
+                                        </li>
+                                    @endif
                                     <li>
                                         <a href="{{ route('admin.get_detailed_reports') }}">
                                             <span class="glyphicon glyphicon-list"></span>

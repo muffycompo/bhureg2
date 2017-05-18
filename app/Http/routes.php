@@ -13,6 +13,8 @@ Route::get('/register', ['as' => 'get.register', 'uses' => 'BhuLoginController@g
 Route::get('/drop_course/{courseId}', ['as' => 'get.drop_course', 'uses' => 'BhuLoginController@dropCourse']);
 
 Route::get('/print_course', ['as' => 'get.print_course', 'uses' => 'BhuLoginController@printCourse']);
+Route::get('/results/{sessionId?}/{semesterId?}',['as' => 'get.results', 'uses' => 'BhuLoginController@getResults']);
+//Route::get('/find_results',['as' => 'post.find_results', 'uses' => 'BhuLoginController@findResults']);
 
 // Admin Routes
 Route::get('/admin/login', ['as' => 'admin.get_login', 'uses' => 'BhuAdminController@getLogin']);
@@ -41,6 +43,7 @@ Route::get('/admin/manage_unaasign_course/{userId}/{courseId}/{sessionId}', ['as
 Route::get('/admin/manage_assign_course', ['as' => 'admin.get_hod_manage_assign_course', 'uses' => 'BhuAdminController@getHodManageAssignCourse']);
 Route::get('/admin/manage_result_adjustments', ['as' => 'admin.hod_manage_result_adjustments', 'uses' => 'BhuAdminController@hodManageResultAdjustments']);
 Route::get('/admin/manage_result_adjustment/{courseId}/{userId}/{semesterId}', ['as' => 'admin.hod_manage_result_adjustment', 'uses' => 'BhuAdminController@hodManageCourseResult']);
+Route::get('/admin/department_lecturer', ['as' => 'admin.department_lecturers', 'uses' => 'BhuAdminController@hodDepartmentLecturers']);
 
 
 Route::post('/admin/manage_find_courses', ['as' => 'admin.post_hod_manage_find_courses', 'uses' => 'BhuAdminController@postHodManageFindCourses']);
@@ -59,6 +62,8 @@ Route::get('/admin/manage_approve_course_result/{courseId}/{sessionId}/{semester
 Route::get('/admin/manage_detailed_results/{deptId}/{sessionId}/{semesterId}/{levelId}', ['as' => 'admin.report_detailed_results', 'uses' => 'BhuAdminReportController@manageAdminDetailedCourseResults']);
 Route::get('/admin/manage_results_summary/{deptId}/{sessionId}/{semesterId}/{levelId}', ['as' => 'admin.report_results_summary', 'uses' => 'BhuAdminReportController@manageAdminSummaryCourseResults']);
 Route::get('/admin/manage_results_remark/{deptId}/{sessionId}/{semesterId}/{levelId}', ['as' => 'admin.report_results_remark', 'uses' => 'BhuAdminReportController@manageAdminRemarkCourseResults']);
+Route::get('/admin/manage_finalize_level_result/{deptId}/{sessionId}/{semesterId}/{levelId}', ['as' => 'admin.report_finalize_level_result', 'uses' => 'BhuAdminReportController@manageFinalizeLevelResult']);
+
 // End Reports Section
 
 Route::get('/admin/change_password', ['as' => 'admin.change_password', 'uses' => 'BhuAdminController@getChangePassword']);

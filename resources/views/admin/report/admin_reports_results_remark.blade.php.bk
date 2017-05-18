@@ -25,8 +25,7 @@
                         {{ expandLevel($levelId) }} LEVEL (GRADE POINT AND REMARK PAGE)<br>
                         {{ changeStringToUpperCase(expandSemester($semesterId)) }} SEMESTER {{ $sessionId }} ACADEMIC SESSION<br>
                         {{ departmentalDegreeTitle($deptId) }}<br>
-                        {{-- */$approval = levelApprovalStatus($deptId, $sessionId, $semesterId, $levelId, true);/* --}}
-                        {{ levelApprovalStatus($deptId, $sessionId, $semesterId, $levelId) }}
+                        {{--APPROVAL LEVEL: {{ changeStringToUpperCase(session('role')) }}--}}
                     </strong>
                 </h3>
             </div>
@@ -35,9 +34,6 @@
                     <div class="col-md-12 col-xs-12">
                         <div class="table-responsive">
                             <p class="text-right hidden-print">
-                                @if((is_null($approval) && session('role') == 'HOD') or ($approval == 'HOD' && (session('role') == 'Dean' or session('role') == 'Senate')) or ($approval == 'Dean' && (session('role') == 'Senate')) )
-                                    <a href="{{ route('admin.report_finalize_level_result',[encryptId($deptId), encryptId($sessionId), encryptId($semesterId), encryptId($levelId)]) }}" class="btn btn-success">Finalize Result</a>
-                                @endif
                                 <a href="javascript:;" onclick="window.print();" class="btn btn-primary"><span class="glyphicon glyphicon-print"></span> Print</a>
                                 <a href="{{ route('admin.get_detailed_reports') }}" class="btn btn-danger">Back</a>
                             </p>
@@ -61,21 +57,21 @@
                                         <th>CGPA</th>
                                         <th>Remark</th>
                                     </tr>
-                                    @foreach($registeredStudents as $student)
+                                    @foreach($registeredStudents as $registeredStudent)
                                     <tr>
                                         <td>{{ $sn++ }}</td>
-                                        <td nowrap="nowrap">{{ changeStringToUpperCase($student->surname) . ', ' . changeStringToTitleCase($student->firstname) }}</td>
-                                        <td>{{ $student->regno }}</td>
+                                        <td nowrap="nowrap">{{ expandStudentName($registeredStudent->regno) }}</td>
+                                        <td>{{ $registeredStudent->regno }}</td>
                                         <td class="text-center">
-                                            {{-- */$cur = getCurrentUnits($student->regno, true, false, $sessionId, $semesterId);/* --}}
+                                            {{-- */$cur = getCurrentUnits($registeredStudent->regno, true, false, $sessionId, $semesterId);/* --}}
                                             {{ $cur }}
                                         </td>
                                         <td class="text-center">
-                                            {{-- */$cue = getCurrentUnits($student->regno, false, true, $sessionId, $semesterId);/* --}}
+                                            {{-- */$cue = getCurrentUnits($registeredStudent->regno, false, true, $sessionId, $semesterId);/* --}}
                                             {{ $cue }}
                                         </td>
                                         <td class="text-center">
-                                            {{-- */$wgp = getWeightedGradePoint($student->regno, false, $sessionId, $semesterId);/* --}}
+                                            {{-- */$wgp = getWeightedGradePoint($registeredStudent->regno, false, $sessionId, $semesterId);/* --}}
                                             {{ $wgp }}
                                         </td>
                                         <td class="text-center">
@@ -83,15 +79,15 @@
                                             {{ $gpa }}
                                         </td>
                                         <td class="text-center">
-                                            {{-- */$ptur = getPreviousTotalUnit($student->regno, $sessionId, $semesterId, true);/* --}}
+                                            {{-- */$ptur = getPreviousTotalUnit($registeredStudent->regno, true);/* --}}
                                             {{ $ptur }}
                                         </td>
                                         <td class="text-center">
-                                            {{-- */$ptue = getPreviousTotalUnit($student->regno, $sessionId, $semesterId, false, true);/* --}}
+                                            {{-- */$ptue = getPreviousTotalUnit($registeredStudent->regno, false, true);/* --}}
                                             {{ $ptue }}
                                         </td>
                                         <td class="text-center">
-                                            {{-- */$ptwgp = getWeightedGradePoint($student->regno, true, $sessionId, $semesterId);/* --}}
+                                            {{-- */$ptwgp = getWeightedGradePoint($registeredStudent->regno, true);/* --}}
                                             {{ $ptwgp }}
                                         </td>
                                         <td class="text-center">
@@ -115,7 +111,7 @@
                                             {{ $cgpa }}
                                         </td>
                                         <td>
-                                            {{ getRemarkCarryOvers($student->regno, $sessionId) }}
+                                            {{ getRemarkCarryOvers($registeredStudent->regno) }}
                                         </td>
                                     </tr>
                                     @endforeach

@@ -10,24 +10,29 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <div class="row hidden-print">
-                        <div class="col-md-6"><p>Result Adjustment</p></div>
+                        <div class="col-md-6"><p>Adjustmenting Result For: <strong>{{ $course_id }}</strong></p></div>
                         <div class="col-md-6 text-right">
-                            @if(isCourseResultFinalized($course_id))
+                            @if(isCourseResultFinalizedByHod($course_id,$session_id))
                                 <a href="javascript:;" onclick="window.print();" class="btn btn-primary"><span class="glyphicon glyphicon-print"></span> Print</a>
                             @endif
-                            <a href="{{ route('admin.hod_manage_result_adjustments') }}" class="btn btn-danger"><span class="glyphicon glyphicon-backward"></span> Back</a>
+                            {{--<a href="{{ route('admin.hod_manage_result_adjustments') }}" class="btn btn-danger"><span class="glyphicon glyphicon-backward"></span> Back</a>--}}
                         </div>
                     </div>
 
                 </div>
 
                 <div class="panel-body">
-                    @if(! isCourseResultFinalized($course_id))
+                    @if(! isCourseResultFinalizedByHod($course_id,$session_id))
                     <div class="alert alert-info hidden-print">
                         <p><strong><span class="glyphicon glyphicon-warning-sign"></span>You can ONLY make adjustments to {{ $course_id }} Result ONCE!</strong></p>
                     </div>
                     @endif
-                    <p><strong>Course: {{ $course_id }} - {{ courseTitleAndUnits($course_id) }}</strong></p>
+                    <p class="clearfix"><strong>Course: {{ $course_id }} - {{ courseTitleAndUnits($course_id) }}</strong>
+                        <a href="{{ route('admin.report_manage_result', [encryptId($course_id), encryptId($session_id), encryptId($semester_id)]) }}" class="btn btn-danger pull-right hidden-print">
+                            <span class="glyphicon glyphicon-backward"></span>
+                            Back
+                        </a>
+                    </p>
                     <table class="table table-bordered table-condensed">
                         <tr>
                             <th class="text-center">S/N</th>
@@ -35,7 +40,7 @@
                             <th class="text-center">Name</th>
                             <th class="text-center">C.A (40%)</th>
                             <th class="text-center">Exam (60%)</th>
-                            @if(isCourseResultFinalized($course_id))
+                            @if(isCourseResultFinalizedByHod($course_id,$session_id))
                                 <th class="text-center">Total</th>
                                 <th class="text-center">Grade</th>
                             @endif
@@ -47,7 +52,7 @@
                                 <td>{{ $sn++ }}</td>
                                 <td nowrap="nowrap">{{ $course->students_student_id }}</td>
                                 <td nowrap="nowrap">{{ studentNameFromMatriculationNo($course->students_student_id) }}</td>
-                                @if(isCourseResultFinalized($course_id))
+                                @if(isCourseResultFinalizedByHod($course_id,$session_id))
                                 <td>{{ $course->ca }}</td>
                                 <td>{{ $course->exam }}</td>
                                 <td>
@@ -76,15 +81,19 @@
                                 @endif
                             </tr>
                             @endforeach
-                            @if(! isCourseResultFinalized($course_id))
+                            @if(! isCourseResultFinalizedByHod($course_id,$session_id))
                                 {!! Form::hidden('course_id', $course_id) !!}
                                 {!! Form::hidden('lecturer_id', $user_id) !!}
                                 <tr>
                                     <td colspan="5">
-                                        <div class="form-group">
-                                            <button type="submit" class="btn btn-primary pull-right">
+                                        <div class="form-group pull-right">
+                                            <a href="{{ route('admin.report_manage_result', [encryptId($course_id), encryptId($session_id), encryptId($semester_id)]) }}" class="btn btn-danger">
+                                                <span class="glyphicon glyphicon-backward"></span>
+                                                Back
+                                            </a>
+                                            <button type="submit" class="btn btn-primary">
                                                 <span class="glyphicon glyphicon-floppy-disk"></span>
-                                                Adjust & Approve Result
+                                                Adjust Result
                                             </button>
                                         </div>
                                     </td>

@@ -8,7 +8,7 @@
                 <div class="panel-heading">Manage Assigned Courses</div>
 
                 <div class="panel-body">
-                    <p><strong>Semester: First | Session: 2016/2017</strong></p>
+                    <p><strong>Semester: {{ expandSemester(currentSemester()) }} | Session: {{ currentAcademicSession() }}</strong></p>
                     <table class="table table-bordered table-condensed">
                         <tr>
                             <th class="text-center">Course Code</th>

@@ -9,7 +9,9 @@
 
                 <div class="panel-body">
                     <p>Welcome to your Dashboard, as a <strong>{{ session('role') }}</strong>, you can perform Administrative task!</p>
-                    <p><strong>Department: {{ expandProgram(session('departments_department_id')) }}</strong></p>
+                    @if(session('role') == 'Lecturer' or session('role') == 'HOD')
+                        <p><strong>Department: {{ expandProgram(session('departments_department_id')) }}</strong></p>
+                    @endif
                     <p><strong>Role: {{ session('role') }}</strong></p>
                     <p><strong>Academic Session: {{ currentAcademicSession() }}</strong></p>
                     <p><strong>Semester: {{ expandSemester(currentSemester()) }}</strong></p>

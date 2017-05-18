@@ -18,18 +18,27 @@
 
                     {!! Form::open(['route' => 'admin.post_hod_manage_assign_course', 'method' => 'POST', 'role' => 'form']) !!}
                     <div class="row">
-                        <div class="col-md-6 col-xs-6">
-
+                        <div class="col-md-4">
                             <div class="form-group">
-                                <label for="user_id">Lecturer</label>
-                                {!! Form::select('user_id',lecturersDropdownOptions(),null,['class' => 'form-control', 'id' => 'user_id']) !!}
-                                <p class="help-block"><em>{{ expandProgram(session('departments_department_id')) }} Lecturers Only!</em></p>
+                                <label for="department">Department</label>
+                                {!! Form::select('departments_department_id',departmentDropdownOptions(),session('departments_department_id'),['class' => 'form-control', 'id' => 'department']) !!}
+                                {{--<p class="help-block"><em>{{ expandProgram(session('departments_department_id')) }} Lecturers Only!</em></p>--}}
+                                @if ($errors->has('departments_department_id'))
+                                    <span class="text-danger">{{ $errors->first('departments_department_id') }}</span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="lecturer">Lecturer</label>
+                                {{--{!! Form::select('user_id',lecturersDropdownOptions(),null,['class' => 'form-control', 'id' => 'lecturer']) !!}--}}
+                                <select name="user_id" class="form-control" id="lecturer"></select>
                                 @if ($errors->has('user_id'))
                                     <span class="text-danger">{{ $errors->first('user_id') }}</span>
                                 @endif
                             </div>
                         </div>
-                        <div class="col-md-6 col-xs-6">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="semester">Semester</label>
                                 {!! Form::select('semester',semesterDropdownOptions(),null,['class' => 'form-control', 'id' => 'semester']) !!}

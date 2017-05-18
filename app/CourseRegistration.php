@@ -29,7 +29,6 @@ class CourseRegistration extends Model
                 $registration[] = [
                     'ca' => 0,
                     'exam' => 0,
-                    'approval_status' => null,
                     'semester'          => currentSemester(),
                     'students_student_id'       => session('regno'),
                     'sessions_session_id'    => $session,
@@ -79,7 +78,8 @@ class CourseRegistration extends Model
         }
     }
 
-    public function saveCourseResultHod($lecturerId, $cas, $exams, $students, $courseId, $session, $semester)
+//    public function saveCourseResultHod($lecturerId, $cas, $exams, $students, $courseId, $session, $semester)
+    public function saveCourseResultHod($cas, $exams, $students, $courseId, $session, $semester)
     {
         $role = session('role');
         $casCount = count($cas['ca']);
@@ -96,7 +96,8 @@ class CourseRegistration extends Model
                     ]);
         }
         // Finalize HOD editing privileges
-        return finalizeCourseResult($lecturerId, $courseId, $session, $role);
+//        return finalizeCourseResult($lecturerId, $courseId, $session, $role);
+        return finalizeCourseResult($courseId, $session, $role);
     }
 
     public function uploadCourseResult($request, $courseId, $session, $semester)
