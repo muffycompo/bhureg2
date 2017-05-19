@@ -4,11 +4,11 @@ $(document).ready(function(){
 
     // Dynamic Dropdown
     var departmentDropdown = $('#department');
-
+    
     // Default Departmental Lecturers
     $.ajax({
         type: 'get',
-        url:'/admin/department_lecturer',
+        url: adminUrl,
         data: {
             department_id: departmentDropdown.val()
         },
@@ -29,7 +29,7 @@ $(document).ready(function(){
 
         $.ajax({
             type: 'get',
-            url:'/admin/department_lecturer',
+            url: adminUrl,
             data: {
                 department_id: departmentId
             },

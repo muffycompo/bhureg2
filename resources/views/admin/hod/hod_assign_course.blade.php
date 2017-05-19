@@ -88,4 +88,7 @@
         </div>
     </div>
 </div>
+<script>
+    var adminUrl = "{{ route('admin.department_lecturers') }}";
+</script>
 @endsection
