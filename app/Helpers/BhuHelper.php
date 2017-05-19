@@ -488,7 +488,7 @@ function lecturersDropdownOptions(){
 
 function departmentalCourses($deptId, $session){
     if($deptId == 'MED') { $deptId = 'MBBS'; }
-    if($deptId == 'MIC') { $deptId = 'BIOS'; }
+    if($deptId == 'MIC' or $deptId == 'BIOS') { $deptId = 'MCB'; }
     $courses = DB::connection('mysql2')->table('department_courses')
         ->where('course_program', $deptId)
         ->where('session_session_id', $session)
