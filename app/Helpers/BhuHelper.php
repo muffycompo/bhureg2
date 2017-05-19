@@ -673,6 +673,7 @@ function assignedLecturerCourses($deptId){
 function hodDepartmentLecturers($deptId){
     $lecturers = DB::connection('mysql2')->table('users')
                     ->where('departments_department_id', $deptId)
+                    ->whereNotIn('role', ['Dean','HOD','Senate'])
                     ->orderBy('first_name')
                     ->get(['user_id','first_name','last_name','departments_department_id']);
     return json_encode($lecturers);
