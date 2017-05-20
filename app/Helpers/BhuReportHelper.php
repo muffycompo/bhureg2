@@ -27,13 +27,23 @@ function resultsReport($input){
 
     if($departmentalCourses){
         foreach ($departmentalCourses as $departmentalCourse) {
-            if(lecturerHasFinalized($departmentalCourse->courses_course_id,$session, $semester)){
+            if(lecturerHasFinalized($departmentalCourse->courses_course_id,$session, $semester) && hodOfDepartmentForCourse($departmentalCourse->courses_course_id, $semester)){
                 $courses[] = $departmentalCourse;
             }
         }
     }
 
     return $courses;
+}
+
+function hodOfDepartmentForCourse($courseId, $semester){
+    $deptId = session('departments_department_id');
+
+    $hodDept = DB::connection('mysql2')->table('courses')
+                            ->where('course_id', $courseId)
+                            ->where('semester', $semester)
+                            ->first(['departments_department_id']);
+    return $deptId == $hodDept->departments_department_id ? true : false;
 }
 
 function isCourseResultSubmitted($courseId, $session, $semester, $type){

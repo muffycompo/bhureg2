@@ -93,7 +93,7 @@
                                             </a>
                                             <button type="submit" class="btn btn-primary">
                                                 <span class="glyphicon glyphicon-floppy-disk"></span>
-                                                Adjust Result
+                                                Adjust & Finalize Result
                                             </button>
                                         </div>
                                     </td>

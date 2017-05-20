@@ -97,7 +97,7 @@ class CourseRegistration extends Model
         }
         // Finalize HOD editing privileges
 //        return finalizeCourseResult($lecturerId, $courseId, $session, $role);
-        return finalizeCourseResult($courseId, $session, $role);
+        return finalizeCourseResult($courseId, $session, $semester, $role);
     }
 
     public function uploadCourseResult($request, $courseId, $session, $semester)

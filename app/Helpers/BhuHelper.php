@@ -310,8 +310,7 @@ function isCourseResultFinalizedByHod($courseId, $session = null){
     return $finalizeCourses && $finalizeHodCourses ? true : false;
 }
 
-function finalizeCourseResult($courseId, $session, $type){
-    $semester = currentSemester();
+function finalizeCourseResult($courseId, $session, $semester, $type){
     $userId = session('role') == 'Lecturer' ? session('user_id') : lecturerIdFromCourse($courseId,$session);
     if($type == 'HOD'){
         DB::connection('mysql2')->table('courses_lecturers')
@@ -329,18 +328,23 @@ function finalizeCourseResult($courseId, $session, $type){
 }
 
 function levelApprovalStatus($deptId, $session, $semester, $level, $onlyApproval = false){
+    $role = session('role');
     if($deptId == 'BIOS') { $deptId = 'MCB'; }
     if($deptId == 'MED') { $deptId = 'MBBS'; }
 
-    $approval = DB::connection('mysql2')->table('session_courses_approvals')
-                    ->where('program', $deptId)
-                    ->where('session_id', $session)
-                    ->where('semester_id', $semester)
-                    ->where('level_approved', $level)
-                    ->first(['approval']);
-    if($onlyApproval){ return $approval ? $approval->approval : null; }
-    return $approval ? 'APPROVAL LEVEL: ' . changeStringToUpperCase($approval->approval) : 'APPROVAL LEVEL: NOT APPROVED';
-
+    if($role == 'HOD'){
+        if($onlyApproval){ return 'HOD'; }
+        return 'APPROVAL LEVEL: HOD';
+    } else {
+        $approval = DB::connection('mysql2')->table('session_courses_approvals')
+            ->where('program', $deptId)
+            ->where('session_id', $session)
+            ->where('semester_id', $semester)
+            ->where('level_approved', $level)
+            ->first(['approval']);
+        if($onlyApproval){ return $approval ? $approval->approval : null; }
+        return $approval ? 'APPROVAL LEVEL: ' . changeStringToUpperCase($approval->approval) : 'APPROVAL LEVEL: NOT APPROVED';
+    }
 }
 
 function finalizeResultReport($deptId, $session, $semester, $level){
@@ -523,7 +527,8 @@ function lecturerHasFinalized($courseId, $session, $semester){
                 ->where('sessions_session_id', $session)
                 ->where('courses_course_id', $courseId)
                 ->where('semester', $semester)
-                ->where('approval_status', 'Lecturer')
+//                ->where('approval_status', 'Lecturer')
+                ->whereIn('approval_status', ['Lecturer','HOD','Dean','Senate'])
                 ->exists();
 }
 

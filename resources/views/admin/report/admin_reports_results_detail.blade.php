@@ -35,7 +35,7 @@
                     <div class="col-md-12 col-xs-12">
                         <div class="table-responsive">
                             <p class="text-right hidden-print">
-                                @if((is_null($approval) && session('role') == 'HOD') or ($approval == 'HOD' && (session('role') == 'Dean' or session('role') == 'Senate')) or ($approval == 'Dean' && (session('role') == 'Senate')) )
+                                @if(($approval == 'HOD' && (session('role') == 'Dean' or session('role') == 'Senate')) or ($approval == 'Dean' && (session('role') == 'Senate')) )
                                     <a href="{{ route('admin.report_finalize_level_result',[encryptId($deptId), encryptId($sessionId), encryptId($semesterId), encryptId($levelId)]) }}" class="btn btn-success">Finalize Result</a>
                                 @endif
                                 <a href="javascript:;" onclick="window.print();" class="btn btn-primary"><span class="glyphicon glyphicon-print"></span> Print</a>
