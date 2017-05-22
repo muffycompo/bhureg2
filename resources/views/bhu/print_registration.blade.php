@@ -101,7 +101,7 @@
                                         @endforeach
                                         @else
                                             <tr>
-                                                <td colspan="4">You have not registered your courses!</td>
+                                                <td colspan="5">You have not registered your courses!</td>
                                             </tr>
                                         @endif
                                     </table>

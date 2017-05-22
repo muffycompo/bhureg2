@@ -53,10 +53,11 @@ class CourseRegistration extends Model
             ->delete();
     }
 
-    public function registeredCourses($regno, $session)
+    public function registeredCourses($regno, $session, $semester)
     {
         return $this->where('students_student_id',$regno)
                         ->where('sessions_session_id',$session)
+                        ->where('semester',$semester)
                         ->get();
 
     }

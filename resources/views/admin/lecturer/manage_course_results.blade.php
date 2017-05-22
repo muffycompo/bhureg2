@@ -14,6 +14,7 @@
                             <th class="text-center">Course Code</th>
                             <th class="text-center">Course Title</th>
                             <th class="text-center">Course Unit</th>
+                            <th class="text-center">Semester</th>
                             <th class="text-center">Manage Result</th>
                         </tr>
                         @if(count($courses) > 0)
@@ -22,10 +23,13 @@
                                 <td>{{ $course->courses_course_id }}</td>
                                 <td>{{ courseTitleAndUnits($course->courses_course_id) }}</td>
                                 <td>{{ courseTitleAndUnits($course->courses_course_id,true) }}</td>
+                                <td>{{ expandSemester(semesterFromCourseId($course->courses_course_id, $course->sessions_session_id)) }}</td>
                                 <td>
-                                    <a href="{{ route('admin.lecturer_manage_result',[encryptId($course->courses_course_id)]) }}" data-toggle="tooltip" data-placement="top" title="Manage Results" alt="Manage Results">
-                                        <span class="glyphicon glyphicon-list-alt"></span>
-                                    </a>
+                                    @if(isCourseForCurrentSemester($course->courses_course_id))
+                                        <a href="{{ route('admin.lecturer_manage_result',[encryptId($course->courses_course_id)]) }}" data-toggle="tooltip" data-placement="top" title="Manage Results" alt="Manage Results">
+                                            <span class="glyphicon glyphicon-list-alt"></span>
+                                        </a>
+                                    @endif
                                 </td>
                             </tr>
                             @endforeach

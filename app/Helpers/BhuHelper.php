@@ -510,16 +510,7 @@ function searchCourses($deptId, $semester, $levelId){
                     ->where('course_level', $levelId)
                     ->get();
     return $courses;
-//    if($courses) {
-//        foreach ($courses as $course) {
-//            if(lecturerHasFinalized($course->course_id,$session, $semester)){
-//                $searchCourses[] = $course;
-//            }
-//        }
-//    }
-////    return $courses;
-//    dd($searchCourses);
-//    return $searchCourses;
+
 }
 
 function lecturerHasFinalized($courseId, $session, $semester){
@@ -952,4 +943,37 @@ function updateBiodataForStudents(){
                                 ]);
         }
     }
+
+}
+
+function isCourseForCurrentSemester($courseId){
+    $semesterId = currentSemester();
+    $sessionId = currentAcademicSession();
+    $lecturerId = session('user_id');
+
+    $course = DB::connection('mysql2')->table('course_registration')
+                    ->where('sessions_session_id', $sessionId)
+                    ->where('semester', $semesterId)
+                    ->where('courses_course_id', $courseId)
+                    ->exists();
+    $assignment = DB::connection('mysql2')->table('courses_lecturers')
+                    ->where('users_user_id', $lecturerId)
+                    ->where('sessions_session_id', $sessionId)
+                    ->where('courses_course_id', $courseId)
+                    ->exists();
+    return $course && $assignment ? true : false;
+}
+
+function semesterFromCourseId($courseId, $sessionId){
+    $deptId = session('departments_department_id');
+
+    if($deptId == 'MED') { $deptId = 'MBBS'; }
+    if($deptId == 'BIOS' or $deptId == 'MIC') { $deptId = 'MCB'; }
+
+    $semester = DB::connection('mysql2')->table('department_courses')
+                    ->where('session_session_id', $sessionId)
+                    ->where('courses_course_id', $courseId)
+                    ->where('course_program', $deptId)
+                    ->first(['semester']);
+    return $semester ? $semester->semester : '';
 }

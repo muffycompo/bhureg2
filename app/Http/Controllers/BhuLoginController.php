@@ -22,7 +22,10 @@ class BhuLoginController extends Controller
 
     public function getRegister()
     {
-        $courses = recommendedDepartmentalCourses(session('deptid'),session('levelid'),1,'2016/2017');
+        $sessionId = currentAcademicSession();
+        $semesterId = currentSemester();
+        $courses = recommendedDepartmentalCourses(session('deptid'),session('levelid'),$semesterId,$sessionId);
+
         $carryovers = carryOverCourses(session('regno'),[1,4]);
         return view('bhu.course_registration')
                 ->with(compact('courses'))
@@ -52,8 +55,12 @@ class BhuLoginController extends Controller
     }
 
     public function printCourse(CourseRegistration $registration){
-        $courses = $registration->registeredCourses(session('regno'),'2016/2017');
-//        dd($courses);
+        $studentId = session('regno');
+        $sessionId = currentAcademicSession();
+        $semesterId = currentSemester();
+
+        $courses = $registration->registeredCourses($studentId, $sessionId, $semesterId);
+
         return view('bhu.print_registration')
                     ->with(compact('courses'))
                     ->with('sn',1)

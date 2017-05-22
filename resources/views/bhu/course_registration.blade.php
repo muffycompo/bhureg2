@@ -9,7 +9,7 @@
             @include('bhu._partials._alert')
 
             <div class="panel panel-default">
-                <div class="panel-heading"><strong>Registration Session: {{ currentAcademicSession() }} | Department: {{ expandProgram(session('deptid')) }} | Level: {{ expandLevel(session('levelid')) }}</strong></div>
+                <div class="panel-heading"><strong>Registration Semester: {{ expandSemester(currentSemester()) }} | Registration Session: {{ currentAcademicSession() }} | Department: {{ expandProgram(session('deptid')) }} | Level: {{ expandLevel(session('levelid')) }}</strong></div>
 
                 <div class="panel-body">
 
