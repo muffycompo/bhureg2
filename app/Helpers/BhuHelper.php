@@ -274,9 +274,9 @@ function lecturerManageCourseResult($courseId, $session, $semester){
     return $courses;
 };
 
-function isCourseResultFinalized($courseId){
-    $session = currentAcademicSession();
-    $semester = currentSemester();
+function isCourseResultFinalized($courseId, $session = null, $semester = null){
+    $session = is_null($session) ? currentAcademicSession() : $session;
+    $semester = is_null($semester) ? currentSemester() : $semester;
 //    $role = session('role');
 
     $finalize = DB::connection('mysql2')->table('course_registration')
@@ -288,9 +288,9 @@ function isCourseResultFinalized($courseId){
     return $finalize;
 }
 
-function isCourseResultFinalizedByHod($courseId, $session = null){
+function isCourseResultFinalizedByHod($courseId, $session = null, $semester = null){
     $session = is_null($session) ? currentAcademicSession() : $session;
-    $semester = currentSemester();
+    $semester = is_null($semester) ? currentSemester() : $semester;
     $userId = lecturerIdFromCourse($courseId, $session);
 
     $finalizeCourses = DB::connection('mysql2')->table('course_registration')

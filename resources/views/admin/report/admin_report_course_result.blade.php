@@ -12,7 +12,7 @@
                     <div class="row hidden-print">
                         <div class="col-md-6"><p>Manage Results</p></div>
                         <div class="col-md-6 text-right">
-                            @if(! isCourseResultFinalizedByHod($course_id))
+                            @if(! isCourseResultFinalizedByHod($course_id,$session_id,$semester_id))
                                 <a href="{{ route('admin.lecturer_finalize_result',[encryptId($course_id),encryptId($session_id),encryptId($semester_id)]) }}" class="btn btn-success">
                                     <span class="glyphicon glyphicon-check"></span> Approve Result
                                 </a>
