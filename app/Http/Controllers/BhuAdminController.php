@@ -95,11 +95,11 @@ class BhuAdminController extends Controller
         }
     }
 
-    public function lecturerFinalizeCourseResult($courseId, $sessionId, $semesterId)
+    public function lecturerFinalizeCourseResult($courseId, $sessionId = null, $semesterId = null)
     {
         $courseId = decryptId($courseId);
-        $sessionId = isset($sessionId) ? decryptId($sessionId) : currentAcademicSession();
-        $semesterId = isset($semesterId) ? decryptId($semesterId) : currentSemester();
+        $sessionId = ! is_null($sessionId) ? decryptId($sessionId) : currentAcademicSession();
+        $semesterId = ! is_null($semesterId) ? decryptId($semesterId) : currentSemester();
         $role = session('role');
 
         if(finalizeCourseResult($courseId, $sessionId, $semesterId, $role)){
