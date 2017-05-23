@@ -977,3 +977,14 @@ function semesterFromCourseId($courseId, $sessionId){
                     ->first(['semester']);
     return $semester ? $semester->semester : '';
 }
+
+function isCourseRegistrationEnabled(){
+    $registrationStatus = DB::connection('mysql2')->table('utilities')
+                    ->where('utility_id', 'registration_status')
+                    ->first(['utility_int_value']);
+    if($registrationStatus){
+        return $registrationStatus->utility_int_value == 1 ? true : false;
+    } else {
+        return false;
+    }
+}

@@ -7,9 +7,15 @@
         <div class="col-md-10 col-md-offset-1">
 
             @include('bhu._partials._alert')
-
-            <div class="panel panel-default">
-                <div class="panel-heading"><strong>Registration Semester: {{ expandSemester(currentSemester()) }} | Registration Session: {{ currentAcademicSession() }} | Department: {{ expandProgram(session('deptid')) }} | Level: {{ expandLevel(session('levelid')) }}</strong></div>
+            @if(! isCourseRegistrationEnabled())
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <h3 class="text-danger text-capitalize">Course Registration has been Disabled, Please contact the Academic Office!</h3>
+                    </div>
+                </div>
+            @else
+                <div class="panel panel-default">
+                <div class="panel-heading"><strong>Current Semester: {{ expandSemester(currentSemester()) }} | Current Session: {{ currentAcademicSession() }} | Department: {{ expandProgram(session('deptid')) }} | Level: {{ expandLevel(session('levelid')) }}</strong></div>
 
                 <div class="panel-body">
 
@@ -92,6 +98,7 @@
 
                 </div>
             </div>
+            @endif
         </div>
     </div>
 </div>
