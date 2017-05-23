@@ -43,7 +43,9 @@
                             @if(isCourseResultFinalized($course_id,$session_id,$semester_id))
                                 <a href="javascript:;" onclick="window.print();" class="btn btn-primary"><span class="glyphicon glyphicon-print"></span> Print</a>
                             @endif
-                            <a href="{{ route('admin.lecturer_manage_results') }}" class="btn btn-danger"><span class="glyphicon glyphicon-backward"></span> Back</a>
+                            @if(session('role') == 'Lecturer')
+                                <a href="{{ route('admin.lecturer_manage_results') }}" class="btn btn-danger"><span class="glyphicon glyphicon-backward"></span> Back</a>
+                            @endif
                         </div>
                     </div>
 
