@@ -36,7 +36,7 @@
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="4"><p class="text-center">No course has been assigned to you.</p></td>
+                                <td colspan="5"><p class="text-center">No course has been assigned to you.</p></td>
                             </tr>
                         @endif
                     </table>
