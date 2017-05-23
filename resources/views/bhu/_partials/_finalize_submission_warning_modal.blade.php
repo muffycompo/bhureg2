@@ -10,7 +10,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <a href="{{ route('admin.lecturer_finalize_result',[encryptId($course_id)]) }}" class="btn btn-primary">Finalize</a>
+                <a href="{{ route('admin.lecturer_finalize_result',[encryptId($course_id),encryptId($session_id),encryptId($semester_id)]) }}" class="btn btn-primary">Finalize</a>
             </div>
         </div>
     </div>

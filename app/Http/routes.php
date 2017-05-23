@@ -22,9 +22,9 @@ Route::get('/admin/dashboard', ['as' => 'admin.dashboard', 'uses' => 'BhuAdminCo
 
 // Lecturer Section
 Route::get('/admin/manage_course_results', ['as' => 'admin.lecturer_manage_results', 'uses' => 'BhuAdminController@lecturerManageCourseResults']);
-Route::get('/admin/manage_course_result/{courseId}', ['as' => 'admin.lecturer_manage_result', 'uses' => 'BhuAdminController@lecturerManageCourseResult']);
+Route::get('/admin/manage_course_result/{courseId}/{sessionId?}/{semesterId?}', ['as' => 'admin.lecturer_manage_result', 'uses' => 'BhuAdminController@lecturerManageCourseResult']);
 Route::get('/admin/finalize_course_result/{courseId}/{sessionId?}/{semesterId?}', ['as' => 'admin.lecturer_finalize_result', 'uses' => 'BhuAdminController@lecturerFinalizeCourseResult']);
-Route::get('/admin/finalize_course_result/{courseId}/{export}', ['as' => 'admin.lecturer_export_result', 'uses' => 'BhuAdminController@lecturerExportCourseResult']);
+Route::get('/admin/finalize_course_result/{courseId}/{sessionId?}/{semesterId?}/{export}', ['as' => 'admin.lecturer_export_result', 'uses' => 'BhuAdminController@lecturerExportCourseResult']);
 Route::get('/admin/manage_download_csv_sample', ['as' => 'admin.manage_download_csv_sample', 'uses' => 'BhuAdminController@downloadSampleCsv']);
 
 Route::post('/admin/manage_course_result', ['as' => 'admin.post_lecturer_manage_result', 'uses' => 'BhuAdminController@postLecturerManageCourseResult']);

@@ -8,7 +8,7 @@
                 <div class="panel-heading">Manage Assigned Courses</div>
 
                 <div class="panel-body">
-                    <p><strong>Semester: {{ expandSemester(currentSemester()) }} | Session: {{ currentAcademicSession() }}</strong></p>
+                    <p><strong>Current Semester: {{ expandSemester(currentSemester()) }} | Current Session: {{ currentAcademicSession() }}</strong></p>
                     <table class="table table-bordered table-condensed">
                         <tr>
                             <th class="text-center">Course Code</th>
@@ -25,11 +25,12 @@
                                 <td>{{ courseTitleAndUnits($course->courses_course_id,true) }}</td>
                                 <td>{{ expandSemester(semesterFromCourseId($course->courses_course_id, $course->sessions_session_id)) }}</td>
                                 <td>
-                                    @if(isCourseForCurrentSemester($course->courses_course_id))
-                                        <a href="{{ route('admin.lecturer_manage_result',[encryptId($course->courses_course_id)]) }}" data-toggle="tooltip" data-placement="top" title="Manage Results" alt="Manage Results">
+                                    {{-- */$semester = semesterFromCourseId($course->courses_course_id, $course->sessions_session_id);/* --}}
+                                    {{--@if(isCourseForCurrentSemester($course->courses_course_id))--}}
+                                        <a href="{{ route('admin.lecturer_manage_result',[encryptId($course->courses_course_id), encryptId($course->sessions_session_id), encryptId($semester)]) }}" data-toggle="tooltip" data-placement="top" title="Manage Results" alt="Manage Results">
                                             <span class="glyphicon glyphicon-list-alt"></span>
                                         </a>
-                                    @endif
+                                    {{--@endif--}}
                                 </td>
                             </tr>
                             @endforeach

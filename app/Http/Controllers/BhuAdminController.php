@@ -52,13 +52,18 @@ class BhuAdminController extends Controller
                     ->with(compact('courses'));
     }
 
-    public function lecturerManageCourseResult($courseId)
+    public function lecturerManageCourseResult($courseId, $sessionId = null, $semesterId = null)
     {
         $courseId = decryptId($courseId);
-        $courses = lecturerManageCourseResult($courseId, currentAcademicSession(), currentSemester());
+        $sessionId = !is_null($sessionId) ? decryptId($sessionId) : currentAcademicSession();
+        $semesterId = !is_null($semesterId) ? decryptId($semesterId) : currentSemester();
+
+        $courses = lecturerManageCourseResult($courseId, $sessionId, $semesterId);
         return view('admin.lecturer.manage_course_result')
                     ->with(compact('courses'))
                     ->with('course_id', $courseId)
+                    ->with('session_id', $sessionId)
+                    ->with('semester_id', $semesterId)
                     ->with('current_nav','manage_results')
                     ->with('sn',1);
     }
@@ -69,8 +74,12 @@ class BhuAdminController extends Controller
         $exams = $request->only(['exam']);
         $students = $request->only(['student_id']);
         $courseId = $request->get('course_id');
+        $hiddenSession = $request->get('session_id');
+        $hiddenSemester = $request->get('semester_id');
+        $sessionId = $request->has('session_id') && !is_null($hiddenSession) ?  $hiddenSession : currentAcademicSession();
+        $semesterId = $request->has('session_id') && !is_null($hiddenSemester) ?  $hiddenSemester : currentSemester();
 
-        $courseRegistration->saveCourseResult($cas, $exams, $students, $courseId, currentAcademicSession(), currentSemester());
+        $courseRegistration->saveCourseResult($cas, $exams, $students, $courseId, $sessionId, $semesterId);
 
         return redirect()->back()->with([
             'flash_message' => 'Result for ' . $courseId . ' has been saved Successfully!',
@@ -81,7 +90,12 @@ class BhuAdminController extends Controller
     public function postLecturerManageCourseResultUpload(Request $request, CourseRegistration $registration)
     {
         $courseId = $request->get('course_id');
-        $upload = $registration->uploadCourseResult($request, $courseId, currentAcademicSession(), currentSemester());
+        $hiddenSession = $request->get('session_id');
+        $hiddenSemester = $request->get('semester_id');
+        $sessionId = $request->has('session_id') && !is_null($hiddenSession) ?  $hiddenSession : currentAcademicSession();
+        $semesterId = $request->has('session_id') && !is_null($hiddenSemester) ?  $hiddenSemester : currentSemester();
+
+        $upload = $registration->uploadCourseResult($request, $courseId, $sessionId, $semesterId);
         if($upload != false){
             return redirect()->back()->with([
                 'flash_message' => 'Result Uploaded Successfully!',
@@ -112,10 +126,13 @@ class BhuAdminController extends Controller
         }
     }
 
-    public function lecturerExportCourseResult($courseId, $ext, CourseRegistration $courseRegistration)
+    public function lecturerExportCourseResult($courseId, $sessionId = null, $semesterId = null, $ext, CourseRegistration $courseRegistration)
     {
         $courseId = decryptId($courseId);
-        $courses = lecturerManageCourseResult($courseId, currentAcademicSession(), currentSemester());
+        $sessionId = ! is_null($sessionId) ? decryptId($sessionId) : currentAcademicSession();
+        $semesterId = ! is_null($semesterId) ? decryptId($semesterId) : currentSemester();
+
+        $courses = lecturerManageCourseResult($courseId, $sessionId, $semesterId);
 
         $courseRegistration->exportCourseResult($courses, $courseId, $ext);
 
