@@ -415,8 +415,9 @@ function hodDepartmentCourses($deptId, $session){
     $courses = DB::connection('mysql2')->table('department_courses')
         ->where('course_program', $deptId)
         ->where('session_session_id', $session)
-        ->orderBy('semester','ASC')
         ->orderBy('course_level','ASC')
+        ->orderBy('semester','ASC')
+        ->orderBy('session_session_id','DESC')
         ->get();
     return $courses;
 }
