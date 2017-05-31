@@ -209,6 +209,7 @@ function expandLevel($levelId){
 function expandProgram($deptId){
     if($deptId == 'MED' or $deptId == 'MBBS') return 'Medicine & Surgery';
     if($deptId == 'MIC' or $deptId == 'BIOS') return 'Microbiology';
+    if($deptId == 'BST') return 'BST Unit';
 //    $programs = DB::connection('mysql2')->table('programs')->where('department_id', $deptId)->first();
     $programs = DB::connection('mysql2')->table('programs')->where('program_id', $deptId)->first();
 //    return $programs->department_name;
