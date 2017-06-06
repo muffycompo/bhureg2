@@ -51,10 +51,11 @@ function carryOverCoursesRemark($regno, $sessionId){
 
     $courses = DB::connection('mysql2')->table('course_registration')
             ->select(DB::raw('*,(ca + exam) AS total_score'))
-            ->where('approval_status','Senate')
-            ->where('sessions_session_id',$sessionId)
-            ->where('students_student_id',$regno)
-            ->whereIn('semester',[1,3]); // Only First and Second Semester Carry Overs
+            ->whereIn('approval_status',['Lecturer', 'HOD', 'Dean', 'Senate'])
+//            ->where('approval_status','Senate')
+//            ->where('sessions_session_id',$sessionId)
+            ->where('students_student_id',$regno);
+//            ->whereIn('semester',[1,3]); // Only First and Second Semester Carry Overs
 //            ->where('semester',$semester);
 //    if(!is_null($semester)) {
 //        is_array($semester) ? $courses->whereIn('semester', $semester) : $courses->where('semester',$semester);
@@ -116,7 +117,7 @@ function carryOverCourses($regno, $sessionId){
     $courses = DB::connection('mysql2')->table('course_registration')
             ->select(DB::raw('*,(ca + exam) AS total_score'))
             ->where('approval_status','Senate')
-            ->where('sessions_session_id',$sessionId)
+//            ->where('sessions_session_id',$sessionId)
             ->where('students_student_id',$regno);
 //            ->where('semester',$semester);
 //    if(!is_null($semester)) {

@@ -357,6 +357,7 @@ function expandDepartment($deptId){
 
 function getPreviousTotalUnit($studentId, $sessionId, $semesterId, $registered = false, $earned = false){
     $totalUnits = 0;
+    $sessionL = [];
 //    if($earned){
 //        $courses = DB::connection('mysql2')->table('course_registration')
 //            ->where('students_student_id', $studentId)
@@ -391,14 +392,19 @@ function getPreviousTotalUnit($studentId, $sessionId, $semesterId, $registered =
     $coursesStudents = DB::connection('mysql2')->table('course_registration')
         ->where('students_student_id', $studentId);
     if(count($whereInSessionList) > 0){
-        foreach ($whereInSessionList as $whereSession) {
-            $coursesStudents->where('sessions_session_id', 'like', $whereSession .'%');
+        foreach ($whereInSessionList as $sess) {
+            $sessionL[] = formatSessionYearToSession($sess);
         }
+        $coursesStudents->whereIn('sessions_session_id', $sessionL);
+//        foreach ($whereInSessionList as $whereSession) {
+//            $coursesStudents->where('sessions_session_id', 'like', $whereSession .'%');
+//        }
     }
 
 //    $courses = $coursesStudents->where('semester',$semesterId)->get();
-    $courses = $coursesStudents->where('semester', '<',$semesterId)->get();
-
+//    $courses = $coursesStudents->where('semester', '<',$semesterId)->get();
+    $courses = $coursesStudents->get();
+//    dd($courses);
     // Total Credit Registered
     if($registered){
         if(count($courses) > 0){
@@ -443,20 +449,24 @@ function getPreviousTotalUnit($studentId, $sessionId, $semesterId, $registered =
     return $totalUnits;
 }
 
+function formatSessionYearToSession($year){
+    return ! empty($year) ? $year . '/' . ($year + 1) : $year;
+}
+
 function getCurrentUnits($studentId, $registered = false, $earned = false, $sessionId = null, $semesterId = null){
     $totalUnits = 0;
 
     $sessionId = ! is_null($sessionId)? $sessionId : currentAcademicSession();
     $semesterId = ! is_null($semesterId)? $semesterId : currentSemester();
 
-    $courses = DB::connection('mysql2')->table('course_registration')
-        ->where('students_student_id', $studentId)
-        ->where('sessions_session_id','=', $sessionId)
-        ->where('semester','=', $semesterId)
-        ->get();
-
     // Total Credit Registered
     if($registered){
+        $courses = DB::connection('mysql2')->table('course_registration')
+            ->where('students_student_id', $studentId)
+            ->where('sessions_session_id','=', $sessionId)
+            ->where('semester','=', $semesterId)
+            ->get();
+
         if(count($courses) > 0){
             foreach ($courses as $course) {
                 $totalUnits = $totalUnits + courseTitleAndUnits($course->courses_course_id,true);
@@ -468,6 +478,13 @@ function getCurrentUnits($studentId, $registered = false, $earned = false, $sess
 
     // Total Credit Earned
     if($earned){
+        $courses = DB::connection('mysql2')->table('course_registration')
+            ->whereIn('approval_status', ['Lecturer', 'HOD','Dean','Senate'])
+            ->where('students_student_id', $studentId)
+            ->where('sessions_session_id','=', $sessionId)
+            ->where('semester','=', $semesterId)
+            ->get();
+
         $coursesPassed = [];
         if($courses){
             foreach ($courses as $course) {
@@ -500,6 +517,7 @@ function getCurrentUnits($studentId, $registered = false, $earned = false, $sess
 
 function getWeightedGradePoint($studentId, $previousTotal = false, $sessionId = null, $semesterId = null){
     $coursesScorePoints = 0;
+    $sessionL = [];
     $sessionId = ! is_null($sessionId) ? $sessionId : currentAcademicSession();
     $semesterId = ! is_null($semesterId) ? $semesterId : currentSemester();
 
@@ -526,11 +544,16 @@ function getWeightedGradePoint($studentId, $previousTotal = false, $sessionId = 
         $coursesStudents = DB::connection('mysql2')->table('course_registration')
             ->where('students_student_id', $studentId);
         if(count($whereInSessionList) > 0){
-            foreach ($whereInSessionList as $whereSession) {
-                $coursesStudents->where('sessions_session_id', 'like', $whereSession .'%');
+            foreach ($whereInSessionList as $sess) {
+                $sessionL[] = formatSessionYearToSession($sess);
             }
+            $coursesStudents->whereIn('sessions_session_id', $sessionL);
+//            foreach ($whereInSessionList as $whereSession) {
+//                $coursesStudents->where('sessions_session_id', 'like', $whereSession .'%');
+//            }
         }
-        $courses = $coursesStudents->where('semester', '<', $semesterId)->get();
+//        $courses = $coursesStudents->where('semester', '<', $semesterId)->get();
+        $courses = $coursesStudents->get();
 
     } else {
         $courses = DB::connection('mysql2')->table('course_registration')
