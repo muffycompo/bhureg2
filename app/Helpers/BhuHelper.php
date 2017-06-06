@@ -106,20 +106,20 @@ function carryOverCoursesRemark($regno, $sessionId){
     return $results;
 }
 
-function carryOverCourses($regno, $sessionId){
+function carryOverCourses($regno, $sessionId, $semester = null){
     // Set fetch type to Associative Arrays
     DB::connection('mysql2')->setFetchMode(PDO::FETCH_ASSOC);
 
     $processCoursesScore = [];
-
+    $semester = ! is_null($semester) ? $semester : currentSemester();
     $results = [];
 
     $courses = DB::connection('mysql2')->table('course_registration')
             ->select(DB::raw('*,(ca + exam) AS total_score'))
             ->where('approval_status','Senate')
 //            ->where('sessions_session_id',$sessionId)
-            ->where('students_student_id',$regno);
-//            ->where('semester',$semester);
+            ->where('students_student_id',$regno)
+            ->where('semester',$semester);
 //    if(!is_null($semester)) {
 //        is_array($semester) ? $courses->whereIn('semester', $semester) : $courses->where('semester',$semester);
 //    }
@@ -149,6 +149,7 @@ function carryOverCourses($regno, $sessionId){
             if($score['sessions_session_id'] == '2009/2010' or
                 $score['sessions_session_id'] == '2010/2011' or
                 $score['sessions_session_id'] == '2011/2012' or
+                $score['sessions_session_id'] == '2012/2013' or
                 ($score['sessions_session_id'] == '2013/2014') && str_contains($score['students_student_id'],'BHU/11')){
                 if(max($score['total_score']) < 40){
                     $results[$score['courses_course_id']] = $score;
