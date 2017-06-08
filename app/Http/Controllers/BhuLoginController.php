@@ -27,7 +27,7 @@ class BhuLoginController extends Controller
         $courses = recommendedDepartmentalCourses(session('deptid'),session('levelid'),$semesterId,$sessionId);
 
 //        $carryovers = carryOverCourses(session('regno'),[1,4]);
-        $carryovers = carryOverCourses(session('regno'), $sessionId, $semesterId);
+        $carryovers = carryOverCoursesStudents(session('regno'), $sessionId, $semesterId);
         return view('bhu.course_registration')
                 ->with(compact('courses'))
                 ->with(compact('carryovers'))

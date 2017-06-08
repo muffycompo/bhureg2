@@ -106,12 +106,11 @@ function carryOverCoursesRemark($regno, $sessionId){
     return $results;
 }
 
-function carryOverCourses($regno, $sessionId, $semester = null){
+function carryOverCourses($regno, $sessionId, $semester){
     // Set fetch type to Associative Arrays
     DB::connection('mysql2')->setFetchMode(PDO::FETCH_ASSOC);
 
     $processCoursesScore = [];
-    $semester = ! is_null($semester) ? $semester : currentSemester();
     $results = [];
 
     $courses = DB::connection('mysql2')->table('course_registration')
@@ -125,6 +124,71 @@ function carryOverCourses($regno, $sessionId, $semester = null){
 //    }
 
     if($courses = $courses->get()){
+//        dd($courses);
+        // Rebuild Result Array
+        foreach($courses as $course) {
+            $skippedSession = studentSkippedSessions($course['students_student_id'], $course['sessions_session_id']);
+            if(! $skippedSession){
+                $courseId = $course['courses_course_id'];
+                if (!isset($processCoursesScore[$courseId])) {
+                    $processCoursesScore[$courseId] = $course;
+                    $processCoursesScore[$courseId]['total_score'] = [];
+                }
+                $processCoursesScore[$courseId]['total_score'][] = $course['total_score'];
+            }
+
+        }
+
+        // Check if a course has not been passed by Student
+        // 45 Passmark for BHU/12 and above
+        // Few Exceptions for Spill-Over students
+        // A case of a student (BHU/11/02/02/0039) which have passed during 2013/2014 using Old standard
+
+        foreach ($processCoursesScore as $score) {
+            // 40 Passmark for BHU/11 and below
+            if($score['sessions_session_id'] == '2009/2010' or
+                $score['sessions_session_id'] == '2010/2011' or
+                $score['sessions_session_id'] == '2011/2012' or
+                $score['sessions_session_id'] == '2012/2013' or
+                ($score['sessions_session_id'] == '2013/2014') && str_contains($score['students_student_id'],'BHU/11')){
+                if(max($score['total_score']) < 40){
+                    $results[$score['courses_course_id']] = $score;
+                }
+            } else {
+                if(max($score['total_score']) < 45){
+                    $results[$score['courses_course_id']] = $score;
+                }
+            }
+
+        }
+
+    }
+
+    // Reset fetch type to Object
+    DB::connection('mysql2')->setFetchMode(PDO::FETCH_OBJ);
+
+    return $results;
+}
+
+function carryOverCoursesStudents($regno, $sessionId, $semester){
+    // Set fetch type to Associative Arrays
+    DB::connection('mysql2')->setFetchMode(PDO::FETCH_ASSOC);
+
+    $processCoursesScore = [];
+    $results = [];
+
+    $courses = DB::connection('mysql2')->table('course_registration')
+            ->select(DB::raw('*,(ca + exam) AS total_score'))
+            ->where('approval_status','Senate')
+//            ->where('sessions_session_id',$sessionId)
+            ->where('students_student_id',$regno)
+            ->where('semester',$semester);
+//    if(!is_null($semester)) {
+//        is_array($semester) ? $courses->whereIn('semester', $semester) : $courses->where('semester',$semester);
+//    }
+
+    if($courses = $courses->get()){
+//        dd($courses);
         // Rebuild Result Array
         foreach($courses as $course) {
             $skippedSession = studentSkippedSessions($course['students_student_id'], $course['sessions_session_id']);
