@@ -276,6 +276,7 @@ function expandProgram($deptId){
     if($deptId == 'MED' or $deptId == 'MBBS') return 'Medicine & Surgery';
     if($deptId == 'MIC' or $deptId == 'BIOS') return 'Microbiology';
     if($deptId == 'BST') return 'BST Unit';
+    if($deptId == 'GST') return 'General Studies';
 //    $programs = DB::connection('mysql2')->table('programs')->where('department_id', $deptId)->first();
     $programs = DB::connection('mysql2')->table('programs')->where('program_id', $deptId)->first();
 //    return $programs->department_name;
@@ -318,9 +319,10 @@ function decryptId($id){
 function studentNameFromMatriculationNo($student_id){
     $student = DB::connection('mysql')->table('studentbiodata')
                     ->where('regno', $student_id)
-                    ->select(['firstname','surname'])
+                    ->select(['firstname', 'middlename', 'surname'])
                     ->first();
-    return $student ? ucwords(strtolower($student->firstname . ' ' . $student->surname)) : '';
+    $middlename = isset($student->surname) ? ' ' . $student->surname . ' ' : ' ';
+    return $student ? ucwords(strtolower($student->firstname . $middlename . $student->surname)) : '';
 }
 
 function lecturerAssignedCourses($userId, $session = '2016/2017'){

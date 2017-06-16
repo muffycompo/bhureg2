@@ -48,7 +48,7 @@
                                         </tr>
                                         <tr>
                                             <td>Name</td>
-                                            <td>{{ changeStringToTitleCase(session('firstname')) . ' ' . changeStringToUpperCase(session('surname')) }}</td>
+                                            <td>{{ changeStringToTitleCase(session('firstname')) . ' ' . changeStringToTitleCase(session('middlename')) . ' ' . changeStringToUpperCase(session('surname')) }}</td>
                                         </tr>
                                         <tr>
                                             <td>Registration Level</td>

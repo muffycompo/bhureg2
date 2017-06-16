@@ -158,7 +158,7 @@ function studentsInDepartmentLevel($deptId, $levelId){
         ->where('regno', 'LIKE', 'BHU/%')
         ->whereIn('grad_status', ['N', 'C'])
         ->orderBy('regno')
-        ->get(['regno', 'firstname', 'surname']);
+        ->get(['regno', 'firstname', 'middlename', 'surname']);
 }
 
 function coursesRegisteredByStudentForSessionSemester($studentId, $sessionId, $semesterId){
@@ -303,9 +303,9 @@ function studentRegisteredForAnyCourse($studentId, $sessionId, $semesterId){
 function expandStudentName($studentId){
     $name = DB::connection('mysql')->table('studentbiodata')
         ->where('regno', $studentId)
-        ->first(['surname','firstname']);
+        ->first(['surname','firstname', 'middlename']);
 
-    return $name ? changeStringToUpperCase($name->surname) . ', ' . changeStringToTitleCase($name->firstname) : false;
+    return $name ? changeStringToUpperCase($name->surname) . ', ' . changeStringToTitleCase($name->firstname) . ' ' . changeStringToTitleCase($name->middlename) : false;
 }
 
 function courseResultStringFormat($studentId, $courseId, $sessionId, $semesterId){
