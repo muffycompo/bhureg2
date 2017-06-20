@@ -86,6 +86,7 @@ function carryOverCoursesRemark($regno, $sessionId){
             if($score['sessions_session_id'] == '2009/2010' or
                 $score['sessions_session_id'] == '2010/2011' or
                 $score['sessions_session_id'] == '2011/2012' or
+                $score['sessions_session_id'] == '2012/2013' or
                 ($score['sessions_session_id'] == '2013/2014') && str_contains($score['students_student_id'],'BHU/11')){
                 if(max($score['total_score']) < 40){
                     $results[$score['courses_course_id']] = $score;
@@ -261,6 +262,8 @@ function expandLevel($levelId){
         '2' => '200',
         '3' => '300',
         '4' => '400',
+        '5' => '500',
+        '6' => '600',
     ];
     try
     {
@@ -277,6 +280,7 @@ function expandProgram($deptId){
     if($deptId == 'MIC' or $deptId == 'BIOS') return 'Microbiology';
     if($deptId == 'BST') return 'BST Unit';
     if($deptId == 'GST') return 'General Studies';
+    if($deptId == 'LIB') return 'Library Information System Unit';
 //    $programs = DB::connection('mysql2')->table('programs')->where('department_id', $deptId)->first();
     $programs = DB::connection('mysql2')->table('programs')->where('program_id', $deptId)->first();
 //    return $programs->department_name;
@@ -532,6 +536,8 @@ function levelDropdownOptions(){
         '2' => '200',
         '3' => '300',
         '4' => '400',
+        '5' => '500',
+        '6' => '600',
     ];
 }
 
