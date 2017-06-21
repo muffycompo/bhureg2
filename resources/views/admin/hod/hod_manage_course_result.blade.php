@@ -10,9 +10,9 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <div class="row hidden-print">
-                        <div class="col-md-6"><p>Adjustmenting Result For: <strong>{{ $course_id }}</strong></p></div>
+                        <div class="col-md-6"><p>Adjusting Result For: <strong>{{ $course_id }}</strong></p></div>
                         <div class="col-md-6 text-right">
-                            @if(isCourseResultFinalizedByHod($course_id,$session_id))
+                            @if(isCourseResultFinalizedByHod($course_id,$session_id,$semester_id))
                                 <a href="javascript:;" onclick="window.print();" class="btn btn-primary"><span class="glyphicon glyphicon-print"></span> Print</a>
                             @endif
                             {{--<a href="{{ route('admin.hod_manage_result_adjustments') }}" class="btn btn-danger"><span class="glyphicon glyphicon-backward"></span> Back</a>--}}
@@ -22,7 +22,7 @@
                 </div>
 
                 <div class="panel-body">
-                    @if(! isCourseResultFinalizedByHod($course_id,$session_id))
+                    @if(! isCourseResultFinalizedByHod($course_id,$session_id,$semester_id))
                     <div class="alert alert-info hidden-print">
                         <p><strong><span class="glyphicon glyphicon-warning-sign"></span>You can ONLY make adjustments to {{ $course_id }} Result ONCE!</strong></p>
                     </div>
@@ -40,7 +40,7 @@
                             <th class="text-center">Name</th>
                             <th class="text-center">C.A (40%)</th>
                             <th class="text-center">Exam (60%)</th>
-                            @if(isCourseResultFinalizedByHod($course_id,$session_id))
+                            @if(isCourseResultFinalizedByHod($course_id,$session_id,$semester_id))
                                 <th class="text-center">Total</th>
                                 <th class="text-center">Grade</th>
                             @endif
@@ -52,7 +52,7 @@
                                 <td>{{ $sn++ }}</td>
                                 <td nowrap="nowrap">{{ $course->students_student_id }}</td>
                                 <td nowrap="nowrap">{{ studentNameFromMatriculationNo($course->students_student_id) }}</td>
-                                @if(isCourseResultFinalizedByHod($course_id,$session_id))
+                                @if(isCourseResultFinalizedByHod($course_id,$session_id,$semester_id))
                                 <td>{{ $course->ca }}</td>
                                 <td>{{ $course->exam }}</td>
                                 <td>
@@ -81,7 +81,7 @@
                                 @endif
                             </tr>
                             @endforeach
-                            @if(! isCourseResultFinalizedByHod($course_id,$session_id))
+                            @if(! isCourseResultFinalizedByHod($course_id,$session_id,$semester_id))
                                 {!! Form::hidden('course_id', $course_id) !!}
                                 {!! Form::hidden('lecturer_id', $user_id) !!}
                                 <tr>
