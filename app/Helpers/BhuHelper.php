@@ -339,7 +339,7 @@ function studentNameFromMatriculationNo($student_id){
                     ->where('regno', $student_id)
                     ->select(['firstname', 'middlename', 'surname'])
                     ->first();
-    $middlename = isset($student->surname) ? ' ' . $student->surname . ' ' : ' ';
+    $middlename = isset($student->middlename) ? ' ' . $student->middlename . ' ' : ' ';
     return $student ? ucwords(strtolower($student->firstname . $middlename . $student->surname)) : '';
 }
 
