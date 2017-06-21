@@ -7,13 +7,13 @@
         <div class="col-md-10 col-md-offset-1 col-xs-12">
 
             @include('bhu._partials._alert')
-            @if(! isCourseRegistrationEnabled())
-             <div class="panel panel-default">
-                <div class="panel-body">
-                    <h3 class="text-danger text-capitalize">Course Registration has been Disabled, Please contact the Academic Office!</h3>
-                </div>
-            </div>
-            @else
+            {{--@if(! isCourseRegistrationEnabled())--}}
+             {{--<div class="panel panel-default">--}}
+                {{--<div class="panel-body">--}}
+                    {{--<h3 class="text-danger text-capitalize">Course Registration has been Disabled, Please contact the Academic Office!</h3>--}}
+                {{--</div>--}}
+            {{--</div>--}}
+            {{--@else--}}
              <div class="panel panel-default">
                 <div class="panel-heading clearfix">
                     <div class="container">
@@ -186,7 +186,7 @@
                     </div>
                 </div>
             </div>
-            @endif
+            {{--@endif--}}
         </div>
     </div>
 </div>
