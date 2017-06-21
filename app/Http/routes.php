@@ -12,7 +12,7 @@ Route::get('/home', ['as' => 'dashboard', 'uses' => 'HomeController@index']);
 Route::get('/register', ['as' => 'get.register', 'uses' => 'BhuLoginController@getRegister']);
 Route::get('/drop_course/{courseId}', ['as' => 'get.drop_course', 'uses' => 'BhuLoginController@dropCourse']);
 
-Route::get('/print_course', ['as' => 'get.print_course', 'uses' => 'BhuLoginController@printCourse']);
+Route::get('/print_course/{semester}', ['as' => 'get.print_course', 'uses' => 'BhuLoginController@printCourse']);
 Route::get('/results/{sessionId?}/{semesterId?}',['as' => 'get.results', 'uses' => 'BhuLoginController@getResults']);
 //Route::get('/find_results',['as' => 'post.find_results', 'uses' => 'BhuLoginController@findResults']);
 

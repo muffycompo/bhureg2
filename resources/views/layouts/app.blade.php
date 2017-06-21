@@ -72,7 +72,7 @@
                                     Dashboard
                                 </a>
                             </li>
-                            <li class="dropdown {{ isset($current_nav) && ($current_nav == 'register_course' or $current_nav == 'print_form') ? 'active' : '' }}">
+                            <li class="dropdown {{ isset($current_nav) && ($current_nav == 'register_course' or $current_nav == 'print_form_fs' or $current_nav == 'print_form') ? 'active' : '' }}">
                                 <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                                     <span class="glyphicon glyphicon-th-list"></span>
                                     Course Registration <span class="caret"></span>
@@ -85,10 +85,16 @@
                                             Register Courses
                                         </a>
                                     </li>
-                                    <li class="{{ isset($current_nav) && $current_nav == 'print_form' ? 'active' : '' }}">
-                                        <a href="{{ route('get.print_course') }}">
+                                    <li class="{{ isset($current_nav) && $current_nav == 'print_form_fs' ? 'active' : '' }}">
+                                        <a href="{{ route('get.print_course',[encryptId(1)]) }}">
                                             <span class="glyphicon glyphicon-print"></span>
-                                            Printable Form
+                                            Printable Form (First Semester)
+                                        </a>
+                                    </li>
+                                    <li class="{{ isset($current_nav) && $current_nav == 'print_form' ? 'active' : '' }}">
+                                        <a href="{{ route('get.print_course',[encryptId(3)]) }}">
+                                            <span class="glyphicon glyphicon-print"></span>
+                                            Printable Form (Second Semester)
                                         </a>
                                     </li>
                                 </ul>

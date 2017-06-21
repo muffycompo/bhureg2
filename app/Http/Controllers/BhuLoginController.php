@@ -55,17 +55,19 @@ class BhuLoginController extends Controller
 
     }
 
-    public function printCourse(CourseRegistration $registration){
+    public function printCourse($semester, CourseRegistration $registration){
         $studentId = session('regno');
         $sessionId = currentAcademicSession();
-        $semesterId = currentSemester();
-
+//        $semesterId = currentSemester();
+        $semesterId = decryptId($semester);
+        $nav = $semesterId == 1 ? 'print_form_fs' : 'print_form';
         $courses = $registration->registeredCourses($studentId, $sessionId, $semesterId);
 
         return view('bhu.print_registration')
                     ->with(compact('courses'))
                     ->with('sn',1)
-                    ->with('current_nav','print_form')
+                    ->with('current_nav',$nav)
+                    ->with('semester_id',$semesterId)
                     ->with('units',0);
 
     }

@@ -60,7 +60,7 @@
                                         </tr>
                                         <tr>
                                             <td>Semester</td>
-                                            <td>{{ expandSemester(currentSemester()) }}</td>
+                                            <td>{{ expandSemester($semester_id) }}</td>
                                         </tr>
                                         <tr>
                                             <td>Program</td>
