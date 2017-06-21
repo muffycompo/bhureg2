@@ -87,12 +87,15 @@ function carryOverCoursesRemark($regno, $sessionId){
                 $score['sessions_session_id'] == '2010/2011' or
                 $score['sessions_session_id'] == '2011/2012' or
                 $score['sessions_session_id'] == '2012/2013' or
-                ($score['sessions_session_id'] == '2013/2014') && str_contains($score['students_student_id'],'BHU/11')){
-                if(max($score['total_score']) < 40){
+                str_contains($score['students_student_id'],'BHU/10') or
+                str_contains($score['students_student_id'],'BHU/11')){
+//                ($score['sessions_session_id'] == '2013/2014') && str_contains($score['students_student_id'],'BHU/11')){
+
+                if(max($score['total_score']) < 40 && in_array($score['courses_course_id'],$results) == false){
                     $results[$score['courses_course_id']] = $score;
                 }
             } else {
-                if(max($score['total_score']) < 45){
+                if(max($score['total_score']) < 45 && in_array($score['courses_course_id'],$results) == false){
                     $results[$score['courses_course_id']] = $score;
                 }
             }
@@ -147,16 +150,22 @@ function carryOverCourses($regno, $sessionId, $semester){
 
         foreach ($processCoursesScore as $score) {
             // 40 Passmark for BHU/11 and below
+//            if($score['sessions_session_id'] == '2009/2010' or
+//                $score['sessions_session_id'] == '2010/2011' or
+//                $score['sessions_session_id'] == '2011/2012' or
+//                $score['sessions_session_id'] == '2012/2013' or
+//                ($score['sessions_session_id'] == '2013/2014') && str_contains($score['students_student_id'],'BHU/11')){
             if($score['sessions_session_id'] == '2009/2010' or
                 $score['sessions_session_id'] == '2010/2011' or
                 $score['sessions_session_id'] == '2011/2012' or
                 $score['sessions_session_id'] == '2012/2013' or
-                ($score['sessions_session_id'] == '2013/2014') && str_contains($score['students_student_id'],'BHU/11')){
-                if(max($score['total_score']) < 40){
+                str_contains($score['students_student_id'],'BHU/10') or
+                str_contains($score['students_student_id'],'BHU/11')){
+                if(max($score['total_score']) < 40 && in_array($score['courses_course_id'],$results) == false){
                     $results[$score['courses_course_id']] = $score;
                 }
             } else {
-                if(max($score['total_score']) < 45){
+                if(max($score['total_score']) < 45 && in_array($score['courses_course_id'],$results) == false){
                     $results[$score['courses_course_id']] = $score;
                 }
             }
@@ -211,22 +220,27 @@ function carryOverCoursesStudents($regno, $sessionId, $semester){
 
         foreach ($processCoursesScore as $score) {
             // 40 Passmark for BHU/11 and below
+//            if($score['sessions_session_id'] == '2009/2010' or
+//                $score['sessions_session_id'] == '2010/2011' or
+//                $score['sessions_session_id'] == '2011/2012' or
+//                $score['sessions_session_id'] == '2012/2013' or
+//                ($score['sessions_session_id'] == '2013/2014') && str_contains($score['students_student_id'],'BHU/11')){
             if($score['sessions_session_id'] == '2009/2010' or
                 $score['sessions_session_id'] == '2010/2011' or
                 $score['sessions_session_id'] == '2011/2012' or
                 $score['sessions_session_id'] == '2012/2013' or
-                ($score['sessions_session_id'] == '2013/2014') && str_contains($score['students_student_id'],'BHU/11')){
-                if(max($score['total_score']) < 40){
-                    $results[$score['courses_course_id']] = $score;
-                }
+                str_contains($score['students_student_id'],'BHU/10') or
+                str_contains($score['students_student_id'],'BHU/11')){
+                    if(max($score['total_score']) < 40 && in_array($score['courses_course_id'],$results) == false){
+                        $results[$score['courses_course_id']] = $score;
+                    }
             } else {
-                if(max($score['total_score']) < 45){
+                if(max($score['total_score']) < 45 && in_array($score['courses_course_id'],$results) == false){
                     $results[$score['courses_course_id']] = $score;
                 }
             }
 
         }
-
     }
 
     // Reset fetch type to Object
