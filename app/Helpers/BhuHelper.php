@@ -1055,17 +1055,23 @@ function isCourseForCurrentSemester($courseId){
 }
 
 function semesterFromCourseId($courseId, $sessionId){
-    $deptId = session('departments_department_id');
+//    $deptId = session('departments_department_id');
+    $userId = session('user_id');
+//    if($deptId == 'MED') { $deptId = 'MBBS'; }
+//    if($deptId == 'BIOS' or $deptId == 'MIC') { $deptId = 'MCB'; }
 
-    if($deptId == 'MED') { $deptId = 'MBBS'; }
-    if($deptId == 'BIOS' or $deptId == 'MIC') { $deptId = 'MCB'; }
+//    $semester = DB::connection('mysql2')->table('department_courses')
+//                    ->where('session_session_id', $sessionId)
+//                    ->where('courses_course_id', $courseId)
+//                    ->where('course_program', $deptId)
+//                    ->first(['semester']);
 
-    $semester = DB::connection('mysql2')->table('department_courses')
-                    ->where('session_session_id', $sessionId)
+    $semester = DB::connection('mysql2')->table('courses_lecturers')
+                    ->where('sessions_session_id', $sessionId)
                     ->where('courses_course_id', $courseId)
-                    ->where('course_program', $deptId)
+                    ->where('users_user_id', $userId)
                     ->first(['semester']);
-    return $semester ? $semester->semester : '';
+    return $semester ? $semester->semester : currentSemester();
 }
 
 function isCourseRegistrationEnabled(){
