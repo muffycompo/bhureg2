@@ -181,7 +181,8 @@ class BhuAdminController extends Controller
     public function getHodEditCourse($courseId, $semesterId, $levelId)
     {
         $courseId = decryptId($courseId);
-        $course = hodDepartmentCourse($courseId, $semesterId, $levelId);
+        $session = currentAcademicSession();
+        $course = hodDepartmentCourse($courseId, $semesterId, $levelId, $session);
         return view('admin.hod.hod_edit_course')
                     ->with('courseId', $courseId)
                     ->with('current_nav','manage_courses')

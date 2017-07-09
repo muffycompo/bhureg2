@@ -57,15 +57,17 @@
                                 </tr>
                                 @if(count($courses) > 0)
                                     @foreach($courses as $course)
-                                        <tr class="text-center">
-                                            <td>{{ $course->courses_course_id }}</td>
-                                            <td>{{ courseTitleAndUnits($course->courses_course_id) }}</td>
-                                            <td>{{ courseTitleAndUnits($course->courses_course_id, true) }}</td>
-                                            <td>{{ $course->course_type }}</td>
-                                            <td>
-                                                {!! Form::checkbox('course_id[]',$course->courses_course_id) !!}
-                                            </td>
-                                        </tr>
+                                        @if(isCourseFromHodDepartment($course->courses_course_id))
+                                            <tr class="text-center">
+                                                <td>{{ $course->courses_course_id }}</td>
+                                                <td>{{ courseTitleAndUnits($course->courses_course_id) }}</td>
+                                                <td>{{ courseTitleAndUnits($course->courses_course_id, true) }}</td>
+                                                <td>{{ $course->course_type }}</td>
+                                                <td>
+                                                    {!! Form::checkbox('course_id[]',$course->courses_course_id) !!}
+                                                </td>
+                                            </tr>
+                                        @endif
                                     @endforeach
                                 @else
                                     <tr>

@@ -682,13 +682,14 @@ function addCourseToDepartment($courseId, $semesterId, $levelId, $session, $cour
         ->where('course_level', $levelId)
         ->exists()){
             // Update
-         return DB::connection('mysql2')->table('department_courses')
+         $update = DB::connection('mysql2')->table('department_courses')
                 ->where('course_program', formatDeptId($deptIdFromAdmin))
                 ->where('semester', $semesterId)
                 ->where('courses_course_id', $courseId)
                 ->where('session_session_id', $session)
                 ->where('course_level', $levelId)
                 ->update(['course_type' => changeStringToTitleCase($courseType)]);
+         return true;
     } else {
         // Add
         return DB::connection('mysql2')->table('department_courses')
@@ -703,23 +704,36 @@ function addCourseToDepartment($courseId, $semesterId, $levelId, $session, $cour
     }
 }
 
-function hodDepartmentCourse($courseId, $semesterId, $levelId){
+function hodDepartmentCourse($courseId, $semesterId, $levelId, $session){
+    $deptId = session('departments_department_id');
     $course = DB::connection('mysql2')->table('department_courses')
+                ->where('course_program', formatDeptId($deptId))
                 ->where('courses_course_id', $courseId)
                 ->where('course_level', $levelId)
                 ->where('semester', $semesterId)
+                ->where('session_session_id', $session)
                 ->first();
     return $course ? $course : [];
 }
 
 function hodEditDepartmentCourse($courseId, $semesterId, $levelId, $courseType, $session){
+    $deptId = session('departments_department_id');
+    $exists = DB::connection('mysql2')->table('department_courses')
+            ->where('courses_course_id', $courseId)
+            ->where('course_program', formatDeptId($deptId))
+            ->where('course_level', $levelId)
+            ->where('session_session_id', $session)
+            ->exists();
     return DB::connection('mysql2')->table('department_courses')
                 ->where('courses_course_id', $courseId)
+                ->where('course_program', formatDeptId($deptId))
+                ->where('course_level', $levelId)
+                ->where('semester', $semesterId)
                 ->where('session_session_id', $session)
                 ->update([
                     'semester' => $semesterId,
                     'course_level' => $levelId,
-                    'course_type' => $courseType
+                    'course_type' => changeStringToTitleCase($courseType)
                 ]);
 }
 
@@ -1083,4 +1097,12 @@ function isCourseRegistrationEnabled(){
     } else {
         return false;
     }
+}
+
+function isCourseFromHodDepartment($courseId){
+    $deptId = session('departments_department_id');
+    return DB::connection('mysql2')->table('courses')
+        ->where('departments_department_id', $deptId)
+        ->where('course_id', $courseId)
+        ->exists();
 }

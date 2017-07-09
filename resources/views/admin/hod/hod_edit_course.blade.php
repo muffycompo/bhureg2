@@ -22,6 +22,7 @@
 
                             <div class="form-group">
                                 <label for="course_type">Course Type</label>
+                                {{ var_dump($course->course_type) }}
                                 {!! Form::select('course_type',['Core' => 'Core', 'Elective' => 'Elective'],$course->course_type,['class' => 'form-control', 'id' => 'course_type']) !!}
                             </div>
 
