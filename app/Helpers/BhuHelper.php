@@ -295,6 +295,7 @@ function expandProgram($deptId){
     if($deptId == 'BST') return 'BST Unit';
     if($deptId == 'GST') return 'General Studies';
     if($deptId == 'LIB') return 'Library Information System Unit';
+    if($deptId == 'MTH') return 'Mathematics';
 //    $programs = DB::connection('mysql2')->table('programs')->where('department_id', $deptId)->first();
     $programs = DB::connection('mysql2')->table('programs')->where('program_id', $deptId)->first();
 //    return $programs->department_name;
