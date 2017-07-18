@@ -21,7 +21,9 @@
                                 </tr>
                                 <tr>
                                     <td>Name</td>
-                                    <td>{{ changeStringToTitleCase(session('firstname')) . ' ' . changeStringToUpperCase(session('surname')) }}</td>
+
+                                    <td>{{ expandStudentName(session('regno')) }}</td>
+{{--                                    <td>{{ changeStringToTitleCase(session('firstname')) . ' ' . changeStringToUpperCase(session('surname')) }}</td>--}}
                                 </tr>
                                 <tr>
                                     <td>Level</td>
@@ -139,9 +141,11 @@
                             {{-- */$tue = $cue + $ptue;/* --}}
                             {{-- */$twgp = $wgp + $ptwgp;/* --}}
                             {{-- */$cgpa = getGradePointAverage($twgp, $tur);/* --}}
-                            <td><strong>GPA: {{ $gpa }}</strong></td>
-                            <td><strong>CGPA: {{ $cgpa }}</strong></td>
-                            {{--<td><strong>Class of Degree: {{ getClassOfDegree($cgpa) }}</strong></td>--}}
+                            <td><strong>GPA: {{ $studentGPA }}</strong></td>
+{{--                            <td><strong>GPA: {{ $gpa }}</strong></td>--}}
+                            {{--<td><strong>Current CGPA: {{ $cgpa }}</strong></td>--}}
+                            <td><strong>Current CGPA: {{ $studentCGPA }}</strong></td>
+                            <td><strong>Class of Degree: <em>{{ getClassOfDegree($studentCGPA) }}</em></strong></td>
                         </tr>
                     </table>
                 </div>

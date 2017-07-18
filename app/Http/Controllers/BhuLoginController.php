@@ -74,14 +74,19 @@ class BhuLoginController extends Controller
 
     public function getResults(StudentResult $results)
     {
+        $regno = session('regno');
         $sessionId = request()->has('session_id') ? request()->get('session_id') : currentAcademicSession();
         $semesterId = request()->has('semester') ? request()->get('semester') : currentSemester();
         $results = $results->studentSemesterResult($sessionId, $semesterId);
+        $studentGPA = getStudentGPA($regno,$sessionId,$semesterId);
+        $studentCGPA = getStudentCGPA($regno);
         return view('bhu.session_results')
                     ->with('sn',1)
                     ->with(compact('sessionId'))
                     ->with(compact('semesterId'))
                     ->with(compact('results'))
+                    ->with(compact('studentGPA'))
+                    ->with(compact('studentCGPA'))
                     ->with('current_nav','student_results');
     }
     

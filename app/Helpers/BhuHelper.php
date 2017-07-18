@@ -987,11 +987,13 @@ function getClassOfDegree($cgpa){
     if($cgpa >= 4.5){
         return 'First Class';
     } elseif ($cgpa >= 3.5 && $cgpa <=4.49){
-        return 'Second Class (Upper)';
-    } elseif ($cgpa >= 2.45 && $cgpa <=3.49){
-        return 'Second Class (Lower)';
-    } else {
+        return 'Second Class Upper Division';
+    } elseif ($cgpa >= 2.5 && $cgpa <=3.49){
+        return 'Second Class Lower Division';
+    } elseif ($cgpa >= 1.5 && $cgpa <=2.49){
         return 'Third Class';
+    } else {
+        return 'Pass';
     }
 
     return '';
@@ -1106,4 +1108,56 @@ function isCourseFromHodDepartment($courseId){
         ->where('departments_department_id', $deptId)
         ->where('course_id', $courseId)
         ->exists();
+}
+
+function getStudentGPA($studentId, $session, $semester){
+
+    $totalUnits = 0;
+    $qualityPoints = 0;
+
+    $studentResults = DB::connection('mysql2')->table('course_registration')
+            ->where('students_student_id', $studentId)
+            ->where('sessions_session_id', $session)
+            ->where('semester', $semester)
+            ->where('approval_status', 'Senate')
+            ->get();
+
+    if(count($studentId) > 0){
+        foreach ($studentResults as $studentResult) {
+            $totalUnits = $totalUnits + (int) courseTitleAndUnits($studentResult->courses_course_id,true);
+            $score = $studentResult->ca + $studentResult->exam;
+            $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,false,true));
+        }
+    }
+
+    if($qualityPoints > 0 && $totalUnits > 0){
+        $gpa = $qualityPoints / $totalUnits;
+        return round($gpa,2);
+    }
+    return 'N/A';
+}
+
+function getStudentCGPA($studentId){
+
+    $totalUnits = 0;
+    $qualityPoints = 0;
+
+    $studentResults = DB::connection('mysql2')->table('course_registration')
+            ->where('students_student_id', $studentId)
+            ->where('approval_status', 'Senate')
+            ->get();
+
+    if(count($studentId) > 0){
+        foreach ($studentResults as $studentResult) {
+            $totalUnits = $totalUnits + (int) courseTitleAndUnits($studentResult->courses_course_id,true);
+            $score = $studentResult->ca + $studentResult->exam;
+            $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,false,true));
+        }
+    }
+
+    if($qualityPoints > 0 && $totalUnits > 0){
+        $cgpa = $qualityPoints / $totalUnits;
+        return round($cgpa,2);
+    }
+    return 'N/A';
 }
