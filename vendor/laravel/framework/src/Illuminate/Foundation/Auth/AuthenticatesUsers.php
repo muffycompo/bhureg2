@@ -34,11 +34,12 @@ trait AuthenticatesUsers
     public function postLogin(Request $request)
     {
         $this->validate($request, [
-            'regno' => 'required', 'pin' => 'required',
+            'regno' => 'required', 'pin' => 'required|digits:12',
         ],
         [
-            'regno.required' => 'Matriculation # is required',
-            'pin.required' => 'PIN # is required'
+            'regno.required' => 'Matriculation Number is required',
+            'pin.required' => 'PIN Number is required',
+            'pin.digits' => 'PIN Number must be numeric and 12-digit in length'
         ]);
 
         $credentials = $this->getCredentials($request);

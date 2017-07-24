@@ -10,6 +10,17 @@
             <div class="panel panel-default">
                 <div class="panel-heading text-center">Students Course Registration Portal</div>
                 <div class="panel-body">
+                    @if(session()->has('student_error'))
+                        <div class="row">
+                            <div class="col-md-8 col-md-offset-2">
+                                <div class="alert alert-danger alert-dismissible" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <p>{{ session('student_error') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <form class="form-horizontal" role="form" method="POST" action="{{ url('/login') }}">
                         {{ csrf_field() }}
 

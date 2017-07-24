@@ -67,36 +67,36 @@
                                         <td nowrap="nowrap">{{ changeStringToUpperCase($student->surname) . ', ' . changeStringToTitleCase($student->firstname) }}</td>
                                         <td>{{ $student->regno }}</td>
                                         <td class="text-center">
-                                            {{-- */$cur = studentCurrentUnitsRegistered($student->regno,$sessionId,$semesterId);/* --}}
+                                            {{-- */$cur = getCurrentUnits($student->regno, true, false, $sessionId, $semesterId);/* --}}
                                             {{ $cur }}
                                         </td>
                                         <td class="text-center">
-                                            {{-- */$cue = studentCurrentUnitsEarned($student->regno,$sessionId,$semesterId);/* --}}
+                                            {{-- */$cue = getCurrentUnits($student->regno, false, true, $sessionId, $semesterId);/* --}}
                                             {{ $cue }}
                                         </td>
                                         <td class="text-center">
-                                            {{-- */$wgp = studentCurrentWGP($student->regno,$sessionId,$semesterId);/* --}}
+                                            {{-- */$wgp = getWeightedGradePoint($student->regno, false, $sessionId, $semesterId);/* --}}
                                             {{ $wgp }}
                                         </td>
                                         <td class="text-center">
-                                            {{-- */$gpa = studentCurrentGPA($student->regno,$sessionId,$semesterId);/* --}}
-                                            {{ number_format($gpa,2) }}
+                                            {{-- */$gpa = getGradePointAverage($wgp, $cur);/* --}}
+                                            {{ $gpa }}
                                         </td>
                                         <td class="text-center">
-                                            {{-- */$ptur = studentPreviousTotalUnitRegistered($student->regno,$sessionId,$semesterId);/* --}}
+                                            {{-- */$ptur = getPreviousTotalUnit($student->regno, $sessionId, $semesterId, true);/* --}}
                                             {{ $ptur }}
                                         </td>
                                         <td class="text-center">
-                                            {{-- */$ptue = studentPreviousTotalUnitsEarned($student->regno,$sessionId,$semesterId);/* --}}
+                                            {{-- */$ptue = getPreviousTotalUnit($student->regno, $sessionId, $semesterId, false, true);/* --}}
                                             {{ $ptue }}
                                         </td>
                                         <td class="text-center">
-                                            {{-- */$ptwgp = studentPreviousTotalWGP($student->regno,$sessionId,$semesterId);/* --}}
+                                            {{-- */$ptwgp = getWeightedGradePoint($student->regno, true, $sessionId, $semesterId);/* --}}
                                             {{ $ptwgp }}
                                         </td>
                                         <td class="text-center">
-                                            {{-- */$pgpa = studentPreviousTotalGPA($ptwgp, $ptur);/* --}}
-                                            {{ number_format($pgpa,2) }}
+                                            {{-- */$pgpa = getGradePointAverage($ptwgp, $ptur);/* --}}
+                                            {{ $pgpa }}
                                         </td>
                                         <td class="text-center">
                                             {{-- */$tur = $cur + $ptur;/* --}}
@@ -109,12 +109,10 @@
                                         <td class="text-center">
                                             {{-- */$twgp = $wgp + $ptwgp;/* --}}
                                             {{ $twgp }}
-                                            {{--{{ studentTotalWGP($student->regno) }}--}}
                                         </td>
                                         <td class="text-center">
-                                            {{-- */$cgpa = studentTotalCGPA($twgp, $tur);/* --}}
-                                            {{ number_format($cgpa,2) }}
-{{--                                            {{ studentCGPA($student->regno) }}--}}
+                                            {{-- */$cgpa = getGradePointAverage($twgp, $tur);/* --}}
+                                            {{ $cgpa }}
                                         </td>
                                         <td>
                                             {{ getRemarkCarryOvers($student->regno, $sessionId) }}

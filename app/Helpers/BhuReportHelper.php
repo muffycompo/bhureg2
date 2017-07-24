@@ -358,18 +358,7 @@ function expandDepartment($deptId){
 function getPreviousTotalUnit($studentId, $sessionId, $semesterId, $registered = false, $earned = false){
     $totalUnits = 0;
     $sessionL = [];
-//    if($earned){
-//        $courses = DB::connection('mysql2')->table('course_registration')
-//            ->where('students_student_id', $studentId)
-//            ->where('sessions_session_id','!=',currentAcademicSession())
-//            ->where('approval_status','=','Senate')
-//            ->get();
-//    } else {
-//        $courses = DB::connection('mysql2')->table('course_registration')
-//            ->where('students_student_id', $studentId)
-//            ->where('sessions_session_id','!=',currentAcademicSession())
-//            ->get();
-//    }
+
     $currentSessionYear = getYearFromSessionString($sessionId); // Muffy
     $sessionList = [];
     $whereInSessionList = [];
@@ -396,15 +385,10 @@ function getPreviousTotalUnit($studentId, $sessionId, $semesterId, $registered =
             $sessionL[] = formatSessionYearToSession($sess);
         }
         $coursesStudents->whereIn('sessions_session_id', $sessionL);
-//        foreach ($whereInSessionList as $whereSession) {
-//            $coursesStudents->where('sessions_session_id', 'like', $whereSession .'%');
-//        }
+
     }
 
-//    $courses = $coursesStudents->where('semester',$semesterId)->get();
-//    $courses = $coursesStudents->where('semester', '<',$semesterId)->get();
     $courses = $coursesStudents->get();
-//    dd($courses);
     // Total Credit Registered
     if($registered){
         if(count($courses) > 0){
@@ -421,11 +405,7 @@ function getPreviousTotalUnit($studentId, $sessionId, $semesterId, $registered =
         $coursesPassed = [];
         if(count($courses) > 0){
             foreach ($courses as $course) {
-                if($course->sessions_session_id == '2009/2010' or
-                    $course->sessions_session_id == '2010/2011' or
-                    $course->sessions_session_id == '2011/2012' or
-                    $course->sessions_session_id == '2012/2013' or
-                    ($course->sessions_session_id == '2013/2014' && str_contains($course->students_student_id,'BHU/11'))){
+                if(isOldGradable($studentId)){
 
                     // Old Grading System Applies
                     $score = $course->exam + $course->ca;
@@ -488,11 +468,7 @@ function getCurrentUnits($studentId, $registered = false, $earned = false, $sess
         $coursesPassed = [];
         if($courses){
             foreach ($courses as $course) {
-                if($course->sessions_session_id == '2009/2010' or
-                    $course->sessions_session_id == '2010/2011' or
-                    $course->sessions_session_id == '2011/2012' or
-                    $course->sessions_session_id == '2012/2013' or
-                    $course->sessions_session_id == '2013/2014' && str_contains($course->students_student_id,'BHU/11')){
+                if(isOldGradable($studentId)){
 
                     // Old Grading System Applies
                     $score = $course->exam + $course->ca;
@@ -548,11 +524,7 @@ function getWeightedGradePoint($studentId, $previousTotal = false, $sessionId = 
                 $sessionL[] = formatSessionYearToSession($sess);
             }
             $coursesStudents->whereIn('sessions_session_id', $sessionL);
-//            foreach ($whereInSessionList as $whereSession) {
-//                $coursesStudents->where('sessions_session_id', 'like', $whereSession .'%');
-//            }
         }
-//        $courses = $coursesStudents->where('semester', '<', $semesterId)->get();
         $courses = $coursesStudents->get();
 
     } else {
@@ -568,20 +540,14 @@ function getWeightedGradePoint($studentId, $previousTotal = false, $sessionId = 
         foreach ($courses as $course) {
             $score = $course->exam + $course->ca;
             $unitPoints  = courseTitleAndUnits($course->courses_course_id,true);
-            if($course->sessions_session_id == '2009/2010' or
-                $course->sessions_session_id == '2010/2011' or
-                $course->sessions_session_id == '2011/2012' or
-                $course->sessions_session_id == '2012/2013' or
-                $course->sessions_session_id == '2013/2014' && str_contains($course->students_student_id,'BHU/11')){
+            if(isOldGradable($studentId)){
 
                 // Old Grading System Applies
                 $points = expandGrade($score,true,true);
-//                if(! is_null($course->approval_status)) { $coursesScorePoints = (int) $coursesScorePoints + ( (int) $points * (int) $unitPoints ); }
                 $coursesScorePoints = (int) $coursesScorePoints + ( (int) $points * (int) $unitPoints );
             } else {
                 // New Grading System Applies
                 $points = expandGrade($score,false,true);
-//                if(! is_null($course->approval_status)) { $coursesScorePoints = (int) $coursesScorePoints + ( (int) $points * (int) $unitPoints ); }
                 $coursesScorePoints = (int) $coursesScorePoints + ( (int) $points * (int) $unitPoints );
             }
         }
@@ -680,4 +646,444 @@ function hasStudentRegisteredAnyCourseInSessionSemester($studentId, $sessionId, 
                         ->where('sessions_session_id', $sessionId)
                         ->where('semester', $semesterId)
                         ->exists();
+}
+
+// Students CGPA Refactor
+function studentCurrentUnitsRegistered($studentId, $session, $sememster){
+    $totalUnits = 0;
+    $studentUnitsRegistered = DB::connection('mysql2')->table('course_registration')
+            ->where('students_student_id', $studentId)
+            ->where('sessions_session_id', $session)
+            ->where('semester', $sememster)
+            ->get(['courses_course_id']);
+
+    if(count($studentUnitsRegistered) > 0){
+        foreach ($studentUnitsRegistered as $registeredUnit) {
+            $totalUnits = $totalUnits + (int) courseTitleAndUnits($registeredUnit->courses_course_id,true);
+        }
+    }
+
+    return $totalUnits;
+
+}
+
+function studentCurrentUnitsEarned($studentId, $session, $semester){
+    $totalUnits = 0;
+    $studentUnitsEarned = DB::connection('mysql2')->table('course_registration')
+            ->where('students_student_id', $studentId)
+            ->where('sessions_session_id', $session)
+            ->where('semester', $semester)
+            ->whereIn('approval_status',['Lecturer','HOD','Dean','Senate'])
+            ->get(['courses_course_id','ca','exam','sessions_session_id']);
+
+    if(count($studentUnitsEarned) > 0){
+        foreach ($studentUnitsEarned as $unitEarned) {
+            $score = $unitEarned->ca + $unitEarned->exam;
+            if(isOldGradable($studentId)){
+                // Old Grading System Applies
+                if($score >= 40) {
+                    $totalUnits = $totalUnits + ((int) courseTitleAndUnits($unitEarned->courses_course_id,true));
+                }
+            } else {
+                // New Grading System Applies
+                if($score >= 45) {
+                    $totalUnits = $totalUnits + ((int) courseTitleAndUnits($unitEarned->courses_course_id,true));
+                }
+            }
+        }
+
+    }
+
+    return $totalUnits;
+
+}
+
+function studentCurrentWGP($studentId, $session, $semester){
+
+    $qualityPoints = 0;
+
+    $studentResults = DB::connection('mysql2')->table('course_registration')
+                ->where('students_student_id', $studentId)
+                ->where('sessions_session_id', $session)
+                ->where('semester', $semester)
+                ->whereIn('approval_status',['Lecturer','HOD','Dean','Senate'])
+                ->get(['courses_course_id','ca','exam','sessions_session_id']);
+
+
+    if(count($studentResults) > 0){
+        foreach ($studentResults as $studentResult) {
+            $score = $studentResult->ca + $studentResult->exam;
+
+            if(isOldGradable($studentId)){
+
+                // Old Grading System Applies
+                if($score >= 40){
+                    $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,true,true));
+                }
+
+            } else {
+                // New Grading System Applies
+                if($score >= 45){
+                    $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,false,true));
+                }
+            }
+        }
+    }
+
+    return $qualityPoints;
+}
+
+function studentCurrentGPA($studentId, $session, $semester){
+    $gpa = 0;
+    $totalQualityPoints = studentCurrentWGP($studentId, $session, $semester);
+    $totalUnitsRegistered = studentCurrentUnitsRegistered($studentId, $session, $semester);
+
+    if($totalQualityPoints > 0 && $totalUnitsRegistered > 0){
+        $gpa = $totalQualityPoints / $totalUnitsRegistered;
+        return number_format($gpa,2);
+    }
+    return number_format($gpa,2);
+}
+
+function studentTotalUnitsRegistered($studentId){
+    $totalUnits = 0;
+    $studentUnitsRegistered = DB::connection('mysql2')->table('course_registration')
+        ->where('students_student_id', $studentId)
+        ->get(['courses_course_id']);
+
+    if(count($studentUnitsRegistered) > 0){
+        foreach ($studentUnitsRegistered as $registeredUnit) {
+            $totalUnits = $totalUnits + (int) courseTitleAndUnits($registeredUnit->courses_course_id,true);
+        }
+    }
+
+    return $totalUnits;
+
+}
+
+function studentTotalUnitsEarned($studentId){
+    $totalUnits = 0;
+    $studentUnitsEarned = DB::connection('mysql2')->table('course_registration')
+        ->where('students_student_id', $studentId)
+        ->whereIn('approval_status',['Lecturer','HOD','Dean','Senate'])
+//        ->whereIn('approval_status',['Senate'])
+        ->get(['courses_course_id','ca','exam','sessions_session_id']);
+
+    if(count($studentUnitsEarned) > 0){
+        foreach ($studentUnitsEarned as $unitEarned) {
+            $score = $unitEarned->ca + $unitEarned->exam;
+            if(isOldGradable($studentId)){
+                // Old Grading System Applies
+                if($score >= 40) {
+                    $totalUnits = $totalUnits + ((int) courseTitleAndUnits($unitEarned->courses_course_id,true));
+                }
+            } else {
+                // New Grading System Applies
+                if($score >= 45) {
+                    $totalUnits = $totalUnits + ((int) courseTitleAndUnits($unitEarned->courses_course_id,true));
+                }
+            }
+        }
+
+    }
+
+    return $totalUnits;
+
+}
+
+function studentTotalWGP($studentId){
+
+    $qualityPoints = 0;
+
+    $studentResults = DB::connection('mysql2')->table('course_registration')
+        ->where('students_student_id', $studentId)
+        ->whereIn('approval_status',['Lecturer','HOD','Dean','Senate'])
+//        ->whereIn('approval_status',['Senate'])
+        ->get(['courses_course_id','ca','exam','sessions_session_id']);
+
+
+    if(count($studentResults) > 0){
+        foreach ($studentResults as $studentResult) {
+            $score = $studentResult->ca + $studentResult->exam;
+
+            if(isOldGradable($studentId)){
+
+                // Old Grading System Applies
+                if($score >= 40){
+                    $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,true,true));
+                }
+
+            } else {
+                // New Grading System Applies
+                if($score >= 45){
+                    $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,false,true));
+                }
+            }
+        }
+    }
+
+    return $qualityPoints;
+}
+
+function studentCGPA($studentId){
+    $cgpa = 0;
+    $totalQualityPoints = studentTotalWGP($studentId);
+    $totalUnitsRegistered = studentTotalUnitsRegistered($studentId);
+
+    if($totalQualityPoints > 0 && $totalUnitsRegistered > 0){
+        $cgpa = $totalQualityPoints / $totalUnitsRegistered;
+        return number_format($cgpa,2);
+    }
+    return number_format($cgpa,2);
+}
+
+// Experiment - Previous Session Stuff
+
+function getPreviousSession($sessionId){
+    $session = DB::connection('mysql2')->table('sessions')
+        ->where('session_id',$sessionId)
+        ->first(['previous_session']);
+
+    return $session ? $session->previous_session : $sessionId;
+}
+
+function studentResultSessions($studentId){
+    $list = [];
+    $sessions = DB::connection('mysql2')->table('course_registration')
+        ->where('students_student_id',$studentId)
+        ->groupBy('sessions_session_id')
+        ->get(['sessions_session_id']);
+    if($sessions){
+        foreach ($sessions as $session) {
+            $list[] = $session->sessions_session_id;
+        }
+    }
+
+    return $list;
+}
+
+function studentPreviousSemestersInCurrentSession($currentSemesterId){
+    if($currentSemesterId == 3){
+        return array(1);
+    } elseif ($currentSemesterId == 4){
+        return array(1,3);
+    } else {
+        return [];
+    }
+}
+
+function studentPreviousTotalUnitRegistered($studentId, $session, $semester){
+
+    $previousSessions = [];
+    $sessions = studentResultSessions($studentId);
+
+    while (in_array(getPreviousSession($session), $sessions)) {
+        $session = getPreviousSession($session);
+        $previousSessions[] = $session;
+    }
+
+    $pSessions = count($previousSessions) > 0 ? $previousSessions : $session;
+
+    $totalUnits = 0;
+
+    $units = DB::connection('mysql2')->table('course_registration')
+        ->where('students_student_id', $studentId);
+    if(count($previousSessions) > 0 && is_array($previousSessions)){
+        $units->whereIn('sessions_session_id', $pSessions);
+    } else {
+        $units->where('sessions_session_id', $pSessions);
+    }
+
+    $studentUnitsRegistered = $units->get(['courses_course_id']);
+
+    if(count($studentUnitsRegistered) > 0){
+        foreach ($studentUnitsRegistered as $registeredUnit) {
+            $totalUnits = $totalUnits + (int) courseTitleAndUnits($registeredUnit->courses_course_id,true);
+        }
+    }
+
+    // Do we have previous semesters in the current session?
+    $semesters = studentPreviousSemestersInCurrentSession($semester);
+    if(count($semesters) > 0){
+        $semesterUnits = DB::connection('mysql2')->table('course_registration')
+                ->where('students_student_id', $studentId)
+                ->where('sessions_session_id', $session)
+                ->whereIn('semester', $semesters)
+                ->get(['courses_course_id']);
+
+        if(count($semesterUnits) > 0){
+            foreach ($semesterUnits as $semesterUnit) {
+                $totalUnits = $totalUnits + (int) courseTitleAndUnits($semesterUnit->courses_course_id,true);
+            }
+        }
+    }
+
+    return $totalUnits;
+}
+
+function studentPreviousTotalUnitsEarned($studentId, $session, $semester){
+    $totalUnits = 0;
+
+    $previousSessions = [];
+    $sessions = studentResultSessions($studentId);
+
+    while (in_array(getPreviousSession($session), $sessions)) {
+        $session = getPreviousSession($session);
+        $previousSessions[] = $session;
+    }
+
+    $pSessions = count($previousSessions) > 0 ? $previousSessions : $session;
+
+    $units = DB::connection('mysql2')->table('course_registration')
+        ->where('students_student_id', $studentId)
+        ->whereIn('approval_status',['Lecturer','HOD','Dean','Senate']);
+    if(count($previousSessions) > 0 && is_array($previousSessions)){
+        $units->whereIn('sessions_session_id', $pSessions);
+    } else {
+        $units->where('sessions_session_id', $pSessions);
+    }
+
+    $studentUnitsEarned = $units->get(['courses_course_id','ca','exam','sessions_session_id']);
+
+    if(count($studentUnitsEarned) > 0){
+        foreach ($studentUnitsEarned as $unitEarned) {
+            $score = $unitEarned->ca + $unitEarned->exam;
+            if(isOldGradable($studentId)){
+                // Old Grading System Applies
+                if($score >= 40) {
+                    $totalUnits = $totalUnits + ((int) courseTitleAndUnits($unitEarned->courses_course_id,true));
+                }
+            } else {
+                // New Grading System Applies
+                if($score >= 45) {
+                    $totalUnits = $totalUnits + ((int) courseTitleAndUnits($unitEarned->courses_course_id,true));
+                }
+            }
+        }
+
+    }
+
+    // Do we have previous semesters in the current session?
+    $semesters = studentPreviousSemestersInCurrentSession($semester);
+    if(count($semesters) > 0){
+        $semesterUnitsEarned = DB::connection('mysql2')->table('course_registration')
+            ->where('students_student_id', $studentId)
+            ->where('sessions_session_id', $session)
+            ->whereIn('approval_status',['Lecturer','HOD','Dean','Senate'])
+            ->whereIn('semester', $semesters)
+            ->get(['courses_course_id','ca','exam','sessions_session_id']);
+
+        if(count($semesterUnitsEarned) > 0){
+            foreach ($semesterUnitsEarned as $semesterUnitEarned) {
+                $score = $semesterUnitEarned->ca + $semesterUnitEarned->exam;
+                if(isOldGradable($studentId)){
+                    // Old Grading System Applies
+                    if($score >= 40) {
+                        $totalUnits = $totalUnits + ((int) courseTitleAndUnits($semesterUnitEarned->courses_course_id,true));
+                    }
+                } else {
+                    // New Grading System Applies
+                    if($score >= 45) {
+                        $totalUnits = $totalUnits + ((int) courseTitleAndUnits($semesterUnitEarned->courses_course_id,true));
+                    }
+                }
+            }
+        }
+    }
+
+    return $totalUnits;
+
+}
+
+function studentPreviousTotalWGP($studentId, $session, $semester){
+
+    $qualityPoints = 0;
+
+    $previousSessions = [];
+    $sessions = studentResultSessions($studentId);
+
+    while (in_array(getPreviousSession($session), $sessions)) {
+        $session = getPreviousSession($session);
+        $previousSessions[] = $session;
+    }
+
+    $pSessions = count($previousSessions) > 0 ? $previousSessions : $session;
+
+    $points = DB::connection('mysql2')->table('course_registration')
+        ->where('students_student_id', $studentId)
+        ->whereIn('approval_status',['Lecturer','HOD','Dean','Senate']);
+    if(count($previousSessions) > 0 && is_array($previousSessions)){
+        $points->whereIn('sessions_session_id', $pSessions);
+    } else {
+        $points->where('sessions_session_id', $pSessions);
+    }
+
+    $studentResults = $points->get(['courses_course_id','ca','exam','sessions_session_id']);
+
+    if(count($studentResults) > 0){
+        foreach ($studentResults as $studentResult) {
+            $score = $studentResult->ca + $studentResult->exam;
+
+            if(isOldGradable($studentId)){
+
+                // Old Grading System Applies
+                if($score >= 40){
+                    $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,true,true));
+                }
+
+            } else {
+                // New Grading System Applies
+                if($score >= 45){
+                    $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,false,true));
+                }
+            }
+        }
+    }
+
+    // Do we have previous semesters in the current session?
+    $semesters = studentPreviousSemestersInCurrentSession($semester);
+    if(count($semesters) > 0){
+        $semesterWGPs = DB::connection('mysql2')->table('course_registration')
+            ->where('students_student_id', $studentId)
+            ->where('sessions_session_id', $session)
+            ->whereIn('approval_status',['Lecturer','HOD','Dean','Senate'])
+            ->whereIn('semester', $semesters)
+            ->get(['courses_course_id','ca','exam','sessions_session_id']);
+
+        if(count($semesterWGPs) > 0){
+            foreach ($semesterWGPs as $semesterWGP) {
+                $score = $semesterWGP->ca + $semesterWGP->exam;
+                if(isOldGradable($studentId)){
+                    // Old Grading System Applies
+                    if($score >= 40){
+                        $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($semesterWGP->courses_course_id,true) * (int) expandGrade($score,true,true));
+                    }
+
+                } else {
+                    // New Grading System Applies
+                    if($score >= 45){
+                        $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($semesterWGP->courses_course_id,true) * (int) expandGrade($score,false,true));
+                    }
+                }
+            }
+        }
+    }
+
+    return $qualityPoints;
+}
+
+function studentPreviousTotalGPA($previousTWGP, $previousTUR){
+    $pgpa = 0;
+    if($previousTWGP > 0 && $previousTUR > 0){
+        $pgpa = $previousTWGP / $previousTUR;
+    }
+    return $pgpa;
+}
+
+function studentTotalCGPA($twgp, $tur){
+    $cgpa = 0;
+    if($twgp > 0 && $tur > 0){
+        $cgpa = $twgp / $tur;
+    }
+    return $cgpa;
 }

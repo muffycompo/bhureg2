@@ -48,11 +48,17 @@ class Handler extends ExceptionHandler
         }
 
         if ($e instanceof TokenMismatchException) {
-
+            if(request()->segment(1) == 'admin'){
+                $loginRouteName = 'admin.get_login';
+                $errorSessionName = 'admin_error';
+            } else {
+                $loginRouteName = 'getLogin';
+                $errorSessionName = 'student_error';
+            }
             return redirect()
-                ->route('admin.get_login')
+                ->route($loginRouteName)
                 ->withInput($request->except('_token'))
-                ->with('admin_error', 'Oops! You seem to have been away for a while, please resubmit the form!');
+                ->with($errorSessionName, 'Oops! You seem to have been away for a while, please resubmit the form!');
 
         }
 

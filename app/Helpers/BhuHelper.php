@@ -41,6 +41,15 @@ function recommendedDepartmentalCourses($deptId, $levelId, $semester = null, $se
 
 }
 
+function isOldGradable($studentId){
+    if(str_contains($studentId,'BHU/SCI') or str_contains($studentId,'BHU/SMS') or str_contains($studentId,'BHU/HUM') or str_contains($studentId,'BHU/MED')){
+        return true;
+    }
+
+    $parts = explode('/',$studentId);
+    return $parts[1] < 13 ? true : false;
+}
+
 function carryOverCoursesRemark($regno, $sessionId){
     // Set fetch type to Associative Arrays
     DB::connection('mysql2')->setFetchMode(PDO::FETCH_ASSOC);
@@ -83,14 +92,7 @@ function carryOverCoursesRemark($regno, $sessionId){
 
         foreach ($processCoursesScore as $score) {
             // 40 Passmark for BHU/11 and below
-            if($score['sessions_session_id'] == '2009/2010' or
-                $score['sessions_session_id'] == '2010/2011' or
-                $score['sessions_session_id'] == '2011/2012' or
-                $score['sessions_session_id'] == '2012/2013' or
-                str_contains($score['students_student_id'],'BHU/10') or
-                str_contains($score['students_student_id'],'BHU/11')){
-//                ($score['sessions_session_id'] == '2013/2014') && str_contains($score['students_student_id'],'BHU/11')){
-
+            if(isOldGradable($score['students_student_id'])){
                 if(max($score['total_score']) < 40 && in_array($score['courses_course_id'],$results) == false){
                     $results[$score['courses_course_id']] = $score;
                 }
@@ -150,17 +152,7 @@ function carryOverCourses($regno, $sessionId, $semester){
 
         foreach ($processCoursesScore as $score) {
             // 40 Passmark for BHU/11 and below
-//            if($score['sessions_session_id'] == '2009/2010' or
-//                $score['sessions_session_id'] == '2010/2011' or
-//                $score['sessions_session_id'] == '2011/2012' or
-//                $score['sessions_session_id'] == '2012/2013' or
-//                ($score['sessions_session_id'] == '2013/2014') && str_contains($score['students_student_id'],'BHU/11')){
-            if($score['sessions_session_id'] == '2009/2010' or
-                $score['sessions_session_id'] == '2010/2011' or
-                $score['sessions_session_id'] == '2011/2012' or
-                $score['sessions_session_id'] == '2012/2013' or
-                str_contains($score['students_student_id'],'BHU/10') or
-                str_contains($score['students_student_id'],'BHU/11')){
+            if(isOldGradable($score['students_student_id'])){
                 if(max($score['total_score']) < 40 && in_array($score['courses_course_id'],$results) == false){
                     $results[$score['courses_course_id']] = $score;
                 }
@@ -220,17 +212,7 @@ function carryOverCoursesStudents($regno, $sessionId, $semester){
 
         foreach ($processCoursesScore as $score) {
             // 40 Passmark for BHU/11 and below
-//            if($score['sessions_session_id'] == '2009/2010' or
-//                $score['sessions_session_id'] == '2010/2011' or
-//                $score['sessions_session_id'] == '2011/2012' or
-//                $score['sessions_session_id'] == '2012/2013' or
-//                ($score['sessions_session_id'] == '2013/2014') && str_contains($score['students_student_id'],'BHU/11')){
-            if($score['sessions_session_id'] == '2009/2010' or
-                $score['sessions_session_id'] == '2010/2011' or
-                $score['sessions_session_id'] == '2011/2012' or
-                $score['sessions_session_id'] == '2012/2013' or
-                str_contains($score['students_student_id'],'BHU/10') or
-                str_contains($score['students_student_id'],'BHU/11')){
+            if(isOldGradable($score['students_student_id'])){
                     if(max($score['total_score']) < 40 && in_array($score['courses_course_id'],$results) == false){
                         $results[$score['courses_course_id']] = $score;
                     }
@@ -619,19 +601,19 @@ function expandGrade($score, $oldGrade = false, $point = false){
         if($point) return '5';
         return 'A';
     }
-    elseif ($score >= 60 && $score <= 69){
+    elseif ($score >= 60 && $score <= 69.99){
         if($point) return '4';
         return 'B';
     }
-    elseif ($score >= 50 && $score <= 59){
+    elseif ($score >= 50 && $score <= 59.99){
         if($point) return '3';
         return 'C';
     }
-    elseif ($score >= 45 && $score <= 49){
+    elseif ($score >= 45 && $score <= 49.99){
         if($point) return '2';
         return 'D';
     }
-    elseif ($score >= 40 && $score <= 44){
+    elseif ($score >= 40 && $score <= 44.99){
         if($oldGrade){
             return 'E';
         }
@@ -639,7 +621,7 @@ function expandGrade($score, $oldGrade = false, $point = false){
         if($point) return '0';
         return 'F';
     }
-    elseif ($score >= 0 && $score <= 39){
+    elseif ($score >= 0 && $score <= 39.99){
         if($point) return '0';
         return 'F';
     }
@@ -1122,11 +1104,20 @@ function getStudentGPA($studentId, $session, $semester){
             ->where('approval_status', 'Senate')
             ->get();
 
-    if(count($studentId) > 0){
+    if(count($studentResults) > 0){
         foreach ($studentResults as $studentResult) {
             $totalUnits = $totalUnits + (int) courseTitleAndUnits($studentResult->courses_course_id,true);
             $score = $studentResult->ca + $studentResult->exam;
-            $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,false,true));
+
+            if(isOldGradable($studentId)){
+
+                // Old Grading System Applies
+                $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,true,true));
+
+            } else {
+                // New Grading System Applies
+                $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,false,true));
+            }
         }
     }
 
@@ -1151,7 +1142,16 @@ function getStudentCGPA($studentId){
         foreach ($studentResults as $studentResult) {
             $totalUnits = $totalUnits + (int) courseTitleAndUnits($studentResult->courses_course_id,true);
             $score = $studentResult->ca + $studentResult->exam;
-            $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,false,true));
+
+            if(isOldGradable($studentId)){
+
+                // Old Grading System Applies
+                $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,true,true));
+
+            } else {
+                // New Grading System Applies
+                $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,false,true));
+            }
         }
     }
 
