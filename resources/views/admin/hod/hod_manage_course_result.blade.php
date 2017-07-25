@@ -84,6 +84,7 @@
                             @if(! isCourseResultFinalizedByHod($course_id,$session_id,$semester_id))
                                 {!! Form::hidden('course_id', $course_id) !!}
                                 {!! Form::hidden('lecturer_id', $user_id) !!}
+                                {!! Form::hidden('semester_id', $semester_id) !!}
                                 <tr>
                                     <td colspan="5">
                                         <div class="form-group pull-right">

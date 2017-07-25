@@ -77,7 +77,7 @@ class BhuAdminController extends Controller
         $hiddenSession = $request->get('session_id');
         $hiddenSemester = $request->get('semester_id');
         $sessionId = $request->has('session_id') && !is_null($hiddenSession) ?  $hiddenSession : currentAcademicSession();
-        $semesterId = $request->has('session_id') && !is_null($hiddenSemester) ?  $hiddenSemester : currentSemester();
+        $semesterId = $request->has('semester_id') && !is_null($hiddenSemester) ?  $hiddenSemester : currentSemester();
 
         $courseRegistration->saveCourseResult($cas, $exams, $students, $courseId, $sessionId, $semesterId);
 
@@ -359,9 +359,11 @@ class BhuAdminController extends Controller
         $students = $request->only(['student_id']);
         $courseId = $request->get('course_id');
         $lecturerId = $request->get('lecturer_id');
+        $semesterId = $request->get('semester_id');
 
 //        $courseRegistration->saveCourseResultHod($lecturerId, $cas, $exams, $students, $courseId, currentAcademicSession(), currentSemester());
-        $courseRegistration->saveCourseResultHod($cas, $exams, $students, $courseId, currentAcademicSession(), currentSemester());
+//        $courseRegistration->saveCourseResultHod($cas, $exams, $students, $courseId, currentAcademicSession(), currentSemester());
+        $courseRegistration->saveCourseResultHod($cas, $exams, $students, $courseId, currentAcademicSession(), $semesterId);
 
         return redirect()->back()->with([
             'flash_message' => 'Result for ' . $courseId . ' has been adjusted and finalized Successfully!',
