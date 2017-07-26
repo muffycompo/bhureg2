@@ -43,7 +43,12 @@ function hodOfDepartmentForCourse($courseId, $semester){
                             ->where('course_id', $courseId)
                             ->where('semester', $semester)
                             ->first(['departments_department_id']);
-    return $deptId == $hodDept->departments_department_id ? true : false;
+
+    if($hodDept){
+        return $deptId == $hodDept->departments_department_id ? true : false;
+    } else {
+        return false;
+    }
 }
 
 function isCourseResultSubmitted($courseId, $session, $semester, $type){
@@ -872,38 +877,42 @@ function studentPreviousSemestersInCurrentSession($currentSemesterId){
     }
 }
 
-function studentPreviousTotalUnitRegistered($studentId, $session, $semester){
-
-    $previousSessions = [];
-    $sessions = studentResultSessions($studentId);
-
-    while (in_array(getPreviousSession($session), $sessions)) {
-        $session = getPreviousSession($session);
-        $previousSessions[] = $session;
-    }
-
-    $pSessions = count($previousSessions) > 0 ? $previousSessions : $session;
-
+function studentPreviousTotalUnitRegistered($studentId, $session, $semester)
+{
     $totalUnits = 0;
-
-    $units = DB::connection('mysql2')->table('course_registration')
-        ->where('students_student_id', $studentId);
-    if(count($previousSessions) > 0 && is_array($previousSessions)){
-        $units->whereIn('sessions_session_id', $pSessions);
-    } else {
-        $units->where('sessions_session_id', $pSessions);
-    }
-
-    $studentUnitsRegistered = $units->get(['courses_course_id']);
-
-    if(count($studentUnitsRegistered) > 0){
-        foreach ($studentUnitsRegistered as $registeredUnit) {
-            $totalUnits = $totalUnits + (int) courseTitleAndUnits($registeredUnit->courses_course_id,true);
-        }
-    }
 
     // Do we have previous semesters in the current session?
     $semesters = studentPreviousSemestersInCurrentSession($semester);
+
+    if(count($semesters) > 0){
+        $previousSessions = [];
+        $sessions = studentResultSessions($studentId);
+
+        while (in_array(getPreviousSession($session), $sessions)) {
+            $session = getPreviousSession($session);
+            $previousSessions[] = $session;
+        }
+
+        $pSessions = count($previousSessions) > 0 ? $previousSessions : $session;
+
+        $units = DB::connection('mysql2')->table('course_registration')
+            ->where('students_student_id', $studentId);
+        if (count($previousSessions) > 0 && is_array($previousSessions)) {
+            $units->whereIn('sessions_session_id', $pSessions);
+        } else {
+            $units->where('sessions_session_id', $pSessions);
+        }
+
+        $studentUnitsRegistered = $units->get(['courses_course_id']);
+
+        if (count($studentUnitsRegistered) > 0) {
+            foreach ($studentUnitsRegistered as $registeredUnit) {
+                $totalUnits = $totalUnits + (int)courseTitleAndUnits($registeredUnit->courses_course_id, true);
+            }
+        }
+    }
+
+    // Semesters in Current Session
     if(count($semesters) > 0){
         $semesterUnits = DB::connection('mysql2')->table('course_registration')
                 ->where('students_student_id', $studentId)
@@ -924,47 +933,53 @@ function studentPreviousTotalUnitRegistered($studentId, $session, $semester){
 function studentPreviousTotalUnitsEarned($studentId, $session, $semester){
     $totalUnits = 0;
 
-    $previousSessions = [];
-    $sessions = studentResultSessions($studentId);
-
-    while (in_array(getPreviousSession($session), $sessions)) {
-        $session = getPreviousSession($session);
-        $previousSessions[] = $session;
-    }
-
-    $pSessions = count($previousSessions) > 0 ? $previousSessions : $session;
-
-    $units = DB::connection('mysql2')->table('course_registration')
-        ->where('students_student_id', $studentId)
-        ->whereIn('approval_status',['Lecturer','HOD','Dean','Senate']);
-    if(count($previousSessions) > 0 && is_array($previousSessions)){
-        $units->whereIn('sessions_session_id', $pSessions);
-    } else {
-        $units->where('sessions_session_id', $pSessions);
-    }
-
-    $studentUnitsEarned = $units->get(['courses_course_id','ca','exam','sessions_session_id']);
-
-    if(count($studentUnitsEarned) > 0){
-        foreach ($studentUnitsEarned as $unitEarned) {
-            $score = $unitEarned->ca + $unitEarned->exam;
-            if(isOldGradable($studentId)){
-                // Old Grading System Applies
-                if($score >= 40) {
-                    $totalUnits = $totalUnits + ((int) courseTitleAndUnits($unitEarned->courses_course_id,true));
-                }
-            } else {
-                // New Grading System Applies
-                if($score >= 45) {
-                    $totalUnits = $totalUnits + ((int) courseTitleAndUnits($unitEarned->courses_course_id,true));
-                }
-            }
-        }
-
-    }
-
     // Do we have previous semesters in the current session?
     $semesters = studentPreviousSemestersInCurrentSession($semester);
+
+    //$studentLevel = getStudentLevel($studentId);
+
+    if(count($semesters) > 0){
+        $previousSessions = [];
+        $sessions = studentResultSessions($studentId);
+
+        while (in_array(getPreviousSession($session), $sessions)) {
+            $session = getPreviousSession($session);
+            $previousSessions[] = $session;
+        }
+
+        $pSessions = count($previousSessions) > 0 ? $previousSessions : $session;
+
+        $units = DB::connection('mysql2')->table('course_registration')
+            ->where('students_student_id', $studentId)
+            ->whereIn('approval_status',['Lecturer','HOD','Dean','Senate']);
+        if(count($previousSessions) > 0 && is_array($previousSessions)){
+            $units->whereIn('sessions_session_id', $pSessions);
+        } else {
+            $units->where('sessions_session_id', $pSessions);
+        }
+
+        $studentUnitsEarned = $units->get(['courses_course_id','ca','exam','sessions_session_id']);
+
+        if(count($studentUnitsEarned) > 0){
+            foreach ($studentUnitsEarned as $unitEarned) {
+                $score = $unitEarned->ca + $unitEarned->exam;
+                if(isOldGradable($studentId)){
+                    // Old Grading System Applies
+                    if($score >= 40) {
+                        $totalUnits = $totalUnits + ((int) courseTitleAndUnits($unitEarned->courses_course_id,true));
+                    }
+                } else {
+                    // New Grading System Applies
+                    if($score >= 45) {
+                        $totalUnits = $totalUnits + ((int) courseTitleAndUnits($unitEarned->courses_course_id,true));
+                    }
+                }
+            }
+
+        }
+    }
+
+    // Semesters in Current Session
     if(count($semesters) > 0){
         $semesterUnitsEarned = DB::connection('mysql2')->table('course_registration')
             ->where('students_student_id', $studentId)
@@ -998,50 +1013,53 @@ function studentPreviousTotalUnitsEarned($studentId, $session, $semester){
 function studentPreviousTotalWGP($studentId, $session, $semester){
 
     $qualityPoints = 0;
+    // Do we have previous semesters in the current session?
+    $semesters = studentPreviousSemestersInCurrentSession($semester);
 
-    $previousSessions = [];
-    $sessions = studentResultSessions($studentId);
+    if(count($semesters) > 0){
+        $previousSessions = [];
+        $sessions = studentResultSessions($studentId);
 
-    while (in_array(getPreviousSession($session), $sessions)) {
-        $session = getPreviousSession($session);
-        $previousSessions[] = $session;
-    }
+        while (in_array(getPreviousSession($session), $sessions)) {
+            $session = getPreviousSession($session);
+            $previousSessions[] = $session;
+        }
 
-    $pSessions = count($previousSessions) > 0 ? $previousSessions : $session;
+        $pSessions = count($previousSessions) > 0 ? $previousSessions : $session;
 
-    $points = DB::connection('mysql2')->table('course_registration')
-        ->where('students_student_id', $studentId)
-        ->whereIn('approval_status',['Lecturer','HOD','Dean','Senate']);
-    if(count($previousSessions) > 0 && is_array($previousSessions)){
-        $points->whereIn('sessions_session_id', $pSessions);
-    } else {
-        $points->where('sessions_session_id', $pSessions);
-    }
+        $points = DB::connection('mysql2')->table('course_registration')
+            ->where('students_student_id', $studentId)
+            ->whereIn('approval_status',['Lecturer','HOD','Dean','Senate']);
+        if(count($previousSessions) > 0 && is_array($previousSessions)){
+            $points->whereIn('sessions_session_id', $pSessions);
+        } else {
+            $points->where('sessions_session_id', $pSessions);
+        }
 
-    $studentResults = $points->get(['courses_course_id','ca','exam','sessions_session_id']);
+        $studentResults = $points->get(['courses_course_id','ca','exam','sessions_session_id']);
 
-    if(count($studentResults) > 0){
-        foreach ($studentResults as $studentResult) {
-            $score = $studentResult->ca + $studentResult->exam;
+        if(count($studentResults) > 0){
+            foreach ($studentResults as $studentResult) {
+                $score = $studentResult->ca + $studentResult->exam;
 
-            if(isOldGradable($studentId)){
+                if(isOldGradable($studentId)){
 
-                // Old Grading System Applies
-                if($score >= 40){
-                    $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,true,true));
-                }
+                    // Old Grading System Applies
+                    if($score >= 40){
+                        $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,true,true));
+                    }
 
-            } else {
-                // New Grading System Applies
-                if($score >= 45){
-                    $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,false,true));
+                } else {
+                    // New Grading System Applies
+                    if($score >= 45){
+                        $qualityPoints = $qualityPoints + ((int) courseTitleAndUnits($studentResult->courses_course_id,true) * (int) expandGrade($score,false,true));
+                    }
                 }
             }
         }
     }
 
-    // Do we have previous semesters in the current session?
-    $semesters = studentPreviousSemestersInCurrentSession($semester);
+    // Semesters in Current Session
     if(count($semesters) > 0){
         $semesterWGPs = DB::connection('mysql2')->table('course_registration')
             ->where('students_student_id', $studentId)

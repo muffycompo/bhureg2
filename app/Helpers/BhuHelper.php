@@ -1162,3 +1162,10 @@ function getStudentCGPA($studentId){
     }
     return 'N/A';
 }
+
+function getStudentLevel($studentId){
+    $level = DB::connection('mysql')->table('studentbiodata')
+        ->where('regno', $studentId)
+        ->first(['levelid']);
+    return $level ? $level->levelid : null;
+}
