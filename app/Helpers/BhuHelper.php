@@ -60,7 +60,9 @@ function carryOverCoursesRemark($regno, $sessionId){
 
     $courses = DB::connection('mysql2')->table('course_registration')
             ->select(DB::raw('*,(ca + exam) AS total_score'))
+        // Temporary: Muffy
             ->whereIn('approval_status',['Lecturer', 'HOD', 'Dean', 'Senate'])
+
 //            ->where('approval_status','Senate')
 //            ->where('sessions_session_id',$sessionId)
             ->where('students_student_id',$regno);
@@ -94,11 +96,16 @@ function carryOverCoursesRemark($regno, $sessionId){
             // 40 Passmark for BHU/11 and below
             if(isOldGradable($score['students_student_id'])){
                 if(max($score['total_score']) < 40 && in_array($score['courses_course_id'],$results) == false){
-                    $results[$score['courses_course_id']] = $score;
+                    // Only Get Core Courses
+                    if(isCourseCore($score['courses_course_id'],$sessionId)){
+                        $results[$score['courses_course_id']] = $score;
+                    }
                 }
             } else {
                 if(max($score['total_score']) < 45 && in_array($score['courses_course_id'],$results) == false){
-                    $results[$score['courses_course_id']] = $score;
+                    if(isCourseCore($score['courses_course_id'],$sessionId)){
+                        $results[$score['courses_course_id']] = $score;
+                    }
                 }
             }
 
@@ -250,6 +257,16 @@ function isCourseRegistered($courseId, $session = null, $semester = null){
     }
 
     return $course->exists();
+}
+
+function hasDoneCourseRegistration($studentId, $sessionId, $semesterId){
+    $course = DB::connection('mysql2')->table('course_registration')
+        ->where('students_student_id',$studentId)
+        ->where('sessions_session_id',$sessionId)
+        ->where('semester',$semesterId)
+        ->get();
+
+    return count($course) > 0 ? true : false;
 }
 
 function expandLevel($levelId){

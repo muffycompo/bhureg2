@@ -570,17 +570,22 @@ function getGradePointAverage($upper, $lower){
     return $avg;
 }
 
-function getRemarkCarryOvers($studentId, $sessionId){
-    $results = carryOverCoursesRemark($studentId,$sessionId);
-    if(count($results) > 0){
-        $carryOverStr = '';
-        foreach ($results as $code => $result) {
-            $carryOverStr .= $code . ', ';
+function getRemarkCarryOvers($studentId, $sessionId, $semesterId){
+    if(hasDoneCourseRegistration($studentId, $sessionId, $semesterId)){
+        $results = carryOverCoursesRemark($studentId,$sessionId);
+        if(count($results) > 0){
+            $carryOverStr = '';
+            foreach ($results as $code => $result) {
+                $carryOverStr .= $code . ', ';
+            }
+            return rtrim($carryOverStr, ', ');
+        } else {
+            return 'Pass';
         }
-        return rtrim($carryOverStr, ', ');
     } else {
-        return 'Pass';
+        return 'Not Registered';
     }
+
 }
 function getSummaryCarryOversPass($studentId, $sessionId){
 //    $results = carryOverCourses($studentId);
@@ -884,7 +889,11 @@ function studentPreviousTotalUnitRegistered($studentId, $session, $semester)
     // Do we have previous semesters in the current session?
     $semesters = studentPreviousSemestersInCurrentSession($semester);
 
-    if(count($semesters) > 0){
+    $studentLevel = getStudentLevel($studentId);
+
+    if(count($semesters) == 0 && $studentLevel == 1) {
+        return $totalUnits;
+    } else {
         $previousSessions = [];
         $sessions = studentResultSessions($studentId);
 
@@ -936,9 +945,11 @@ function studentPreviousTotalUnitsEarned($studentId, $session, $semester){
     // Do we have previous semesters in the current session?
     $semesters = studentPreviousSemestersInCurrentSession($semester);
 
-    //$studentLevel = getStudentLevel($studentId);
+    $studentLevel = getStudentLevel($studentId);
 
-    if(count($semesters) > 0){
+    if(count($semesters) == 0 && $studentLevel == 1) {
+        return $totalUnits;
+    } else {
         $previousSessions = [];
         $sessions = studentResultSessions($studentId);
 
@@ -1015,8 +1026,11 @@ function studentPreviousTotalWGP($studentId, $session, $semester){
     $qualityPoints = 0;
     // Do we have previous semesters in the current session?
     $semesters = studentPreviousSemestersInCurrentSession($semester);
+    $studentLevel = getStudentLevel($studentId);
 
-    if(count($semesters) > 0){
+    if(count($semesters) == 0 && $studentLevel == 1) {
+        return $qualityPoints;
+    } else {
         $previousSessions = [];
         $sessions = studentResultSessions($studentId);
 
@@ -1104,4 +1118,21 @@ function studentTotalCGPA($twgp, $tur){
         $cgpa = $twgp / $tur;
     }
     return $cgpa;
+}
+
+function isCourseCore($courseId, $sessionId){
+    DB::connection('mysql2')->setFetchMode(PDO::FETCH_OBJ);
+
+    $programId = session('departments_department_id');
+
+    $courseType = DB::connection('mysql2')->table('department_courses')
+        ->where('course_program', $programId)
+        ->where('courses_course_id', $courseId)
+        ->where('session_session_id', $sessionId)
+        ->first(['course_type']);
+
+    if($courseType){
+        return $courseType->course_type == 'Core' ? true : false;
+    }
+    return false;
 }

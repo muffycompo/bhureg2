@@ -117,7 +117,7 @@
 {{--                                            {{ studentCGPA($student->regno) }}--}}
                                         </td>
                                         <td>
-                                            {{ getRemarkCarryOvers($student->regno, $sessionId) }}
+                                            {{ getRemarkCarryOvers($student->regno, $sessionId, $semesterId) }}
                                         </td>
                                     </tr>
                                     @endforeach
