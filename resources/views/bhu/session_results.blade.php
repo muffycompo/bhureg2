@@ -126,10 +126,10 @@
                         </div>
                 </div>
             </div>
-            <div class="panel panel-default">
-                <div class="panel-body" style="margin-top: 10px;">
-                    <table class="table table-bordered table-condensed">
-                        <tr class="text-center">
+            {{--<div class="panel panel-default">--}}
+                {{--<div class="panel-body" style="margin-top: 10px;">--}}
+                    {{--<table class="table table-bordered table-condensed">--}}
+                        {{--<tr class="text-center">--}}
                             {{-- */$cur = getCurrentUnits(session('regno'), true, false, $sessionId, $semesterId);/* --}}
                             {{-- */$cue = getCurrentUnits(session('regno'), false, true, $sessionId, $semesterId);/* --}}
                             {{-- */$wgp = getWeightedGradePoint(session('regno'), false, $sessionId, $semesterId);/* --}}
@@ -141,15 +141,15 @@
                             {{-- */$tue = $cue + $ptue;/* --}}
                             {{-- */$twgp = $wgp + $ptwgp;/* --}}
                             {{-- */$cgpa = getGradePointAverage($twgp, $tur);/* --}}
-                            <td><strong>GPA: {{ $studentGPA }}</strong></td>
+                            {{--<td><strong>GPA: {{ $studentGPA }}</strong></td>--}}
 {{--                            <td><strong>GPA: {{ $gpa }}</strong></td>--}}
                             {{--<td><strong>Current CGPA: {{ $cgpa }}</strong></td>--}}
-                            <td><strong>Current CGPA: {{ $studentCGPA }}</strong></td>
-                            <td><strong>Class of Degree: <em>{{ getClassOfDegree($studentCGPA) }}</em></strong></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
+                            {{--<td><strong>Current CGPA: {{ $studentCGPA }}</strong></td>--}}
+                            {{--<td><strong>Class of Degree: <em>{{ getClassOfDegree($studentCGPA) }}</em></strong></td>--}}
+                        {{--</tr>--}}
+                    {{--</table>--}}
+                {{--</div>--}}
+            {{--</div>--}}
             @elseif(request()->has('session_id') && request()->has('semester'))
                 <div class="panel panel-default">
                     <div class="panel-body" style="margin-top: 10px;">
