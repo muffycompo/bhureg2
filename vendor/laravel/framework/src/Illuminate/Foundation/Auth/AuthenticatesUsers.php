@@ -18,6 +18,10 @@ trait AuthenticatesUsers
      */
     public function getLogin()
     {
+        if(Auth::check()){
+            return redirect()->route('dashboard');
+        }
+
         if (view()->exists('auth.authenticate')) {
             return view('auth.authenticate');
         }

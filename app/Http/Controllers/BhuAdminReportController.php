@@ -76,8 +76,17 @@ class BhuAdminReportController extends Controller
         $courseId = decryptId($courseId);
         $sessionId = decryptId($sessionId);
         $semesterId = decryptId($semesterId);
+        $lecturerId = lecturerIdFromCourse($courseId,$sessionId);
+        $altEntry = isAltEntryForResult($lecturerId,$courseId,$sessionId,true);
+
+        if($altEntry == 1){
+            $view = 'admin.report.admin_report_single_course_result';
+        } else {
+            $view = 'admin.report.admin_report_course_result';
+        }
+
         $courses = manageAdminCourseResult($courseId, $sessionId, $semesterId);
-        return view('admin.report.admin_report_course_result')
+        return view($view)
             ->with(compact('courses'))
             ->with('course_id', $courseId)
             ->with('semester_id', $semesterId)

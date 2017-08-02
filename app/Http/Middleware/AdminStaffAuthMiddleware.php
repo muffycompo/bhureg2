@@ -18,7 +18,7 @@ class AdminStaffAuthMiddleware
         $userId = session('user_id');
         if(! isset($userId)){
             return redirect()->route('admin.get_login')
-                ->with('admin_error','Please login to access that area!');;
+                ->with('admin_error','Please login to access that area!');
         }
         return $next($request);
     }

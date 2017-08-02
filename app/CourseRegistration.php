@@ -62,13 +62,16 @@ class CourseRegistration extends Model
 
     }
 
-    public function saveCourseResult($cas, $exams, $students, $courseId, $session, $semester)
+    public function saveCourseResult($cas, $exams, $students, $courseId, $session, $semester, $altEntry = null)
     {
         $casCount = count($cas['ca']);
-        for ($i = 0; $i < $casCount; $i++) {
-            $ca = (float) $cas['ca'][$i];
-            $exam = (float) $exams['exam'][$i];
-            $this->where('students_student_id', $students['student_id'][$i])
+        $examsCount = count($exams['exam']);
+
+        if($casCount > 0){
+            for ($i = 0; $i < $casCount; $i++) {
+                $ca = (float) $cas['ca'][$i];
+                $exam = (float) $exams['exam'][$i];
+                $this->where('students_student_id', $students['student_id'][$i])
                     ->where('sessions_session_id', $session)
                     ->where('semester', $semester)
                     ->where('courses_course_id', $courseId)
@@ -76,7 +79,25 @@ class CourseRegistration extends Model
                         'ca' => ($ca <= 40) ? $ca : 0,
                         'exam' => ($exam <= 60) ? $exam : 0
                     ]);
+            }
+        } else {
+            for ($i = 0; $i < $examsCount; $i++) {
+                $exam = (float) $exams['exam'][$i];
+                $this->where('students_student_id', $students['student_id'][$i])
+                    ->where('sessions_session_id', $session)
+                    ->where('semester', $semester)
+                    ->where('courses_course_id', $courseId)
+                    ->update([
+                        'ca' => 0,
+                        'exam' => ($exam <= 100) ? $exam : 0
+                    ]);
+            }
         }
+
+        // Update Alternate Entry
+        $lectureId = lecturerIdFromCourse($courseId,$session);
+        updateAltEntryForResult($lectureId,$courseId,$session,$altEntry);
+
     }
 
 //    public function saveCourseResultHod($lecturerId, $cas, $exams, $students, $courseId, $session, $semester)
@@ -84,10 +105,12 @@ class CourseRegistration extends Model
     {
         $role = session('role');
         $casCount = count($cas['ca']);
-        for ($i = 0; $i < $casCount; $i++) {
-            $ca = (float) $cas['ca'][$i];
-            $exam = (float) $exams['exam'][$i];
-            $this->where('students_student_id', $students['student_id'][$i])
+        $examsCount = count($exams['exam']);
+        if($casCount > 0){
+            for ($i = 0; $i < $casCount; $i++) {
+                $ca = (float) $cas['ca'][$i];
+                $exam = (float) $exams['exam'][$i];
+                $this->where('students_student_id', $students['student_id'][$i])
                     ->where('sessions_session_id', $session)
                     ->where('semester', $semester)
                     ->where('courses_course_id', $courseId)
@@ -95,13 +118,27 @@ class CourseRegistration extends Model
                         'ca' => ($ca <= 40) ? $ca : 0,
                         'exam' => ($exam <= 60) ? $exam : 0
                     ]);
+            }
+        } else {
+            for ($i = 0; $i < $examsCount; $i++) {
+                $exam = (float) $exams['exam'][$i];
+                $this->where('students_student_id', $students['student_id'][$i])
+                    ->where('sessions_session_id', $session)
+                    ->where('semester', $semester)
+                    ->where('courses_course_id', $courseId)
+                    ->update([
+                        'ca' => 0,
+                        'exam' => ($exam <= 100) ? $exam : 0
+                    ]);
+            }
         }
+
         // Finalize HOD editing privileges
 //        return finalizeCourseResult($lecturerId, $courseId, $session, $role);
         return finalizeCourseResult($courseId, $session, $semester, $role);
     }
 
-    public function uploadCourseResult($request, $courseId, $session, $semester)
+    public function uploadCourseResult($request, $courseId, $session, $semester, $altEntry = null)
     {
         if($request->hasFile('course_result')){
             $path = $request->file('course_result')->getRealPath();
@@ -109,15 +146,36 @@ class CourseRegistration extends Model
             })->get();
             if(!empty($data) && $data->count()){
                 foreach ($data as $key => $value) {
-                    $ca = (float) $value->ca;
-                    $exam = (float) $value->exam;
-                    $this->where('students_student_id', $value->matric)
-                         ->where('courses_course_id', $courseId)
-                         ->where('sessions_session_id', $session)
-                         ->where('semester', $semester)
-                         ->update(['ca' => ($ca <= 40) ? $ca : 0, 'exam' => ($exam <= 60) ? $exam : 0]);
+                    if(is_null($altEntry) || $altEntry == 0){
+                        $ca = (float) $value->ca;
+                        $exam = (float) $value->exam;
+                        $this->where('students_student_id', $value->matric)
+                            ->where('courses_course_id', $courseId)
+                            ->where('sessions_session_id', $session)
+                            ->where('semester', $semester)
+                            ->update([
+                                'ca' => ($ca <= 40) ? $ca : 0,
+                                'exam' => ($exam <= 60) ? $exam : 0
+                            ]);
+
+                    } else {
+                        $exam = (float) $value->exam;
+                        $this->where('students_student_id', $value->matric)
+                            ->where('courses_course_id', $courseId)
+                            ->where('sessions_session_id', $session)
+                            ->where('semester', $semester)
+                            ->update([
+                                'ca' => 0,
+                                'exam' => ($exam <= 100) ? $exam : 0
+                            ]);
+
+                    }
                 }
+                // Update Alternate Entry
+                $lectureId = lecturerIdFromCourse($courseId,$session);
+                updateAltEntryForResult($lectureId,$courseId,$session,$altEntry);
             }
+
             return true;
         } else {
             return false;

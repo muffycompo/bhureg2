@@ -126,30 +126,27 @@
                         </div>
                 </div>
             </div>
-            {{--<div class="panel panel-default">--}}
-                {{--<div class="panel-body" style="margin-top: 10px;">--}}
-                    {{--<table class="table table-bordered table-condensed">--}}
-                        {{--<tr class="text-center">--}}
-                            {{-- */$cur = getCurrentUnits(session('regno'), true, false, $sessionId, $semesterId);/* --}}
-                            {{-- */$cue = getCurrentUnits(session('regno'), false, true, $sessionId, $semesterId);/* --}}
-                            {{-- */$wgp = getWeightedGradePoint(session('regno'), false, $sessionId, $semesterId);/* --}}
-                            {{-- */$gpa = getGradePointAverage($wgp, $cur);/* --}}
-                            {{-- */$ptur = getPreviousTotalUnit(session('regno'), $sessionId, $semesterId, true);/* --}}
-                            {{-- */$ptue = getPreviousTotalUnit(session('regno'), $sessionId, $semesterId, false, true);/* --}}
-                            {{-- */$ptwgp = getWeightedGradePoint(session('regno'), true, $sessionId, $semesterId);/* --}}
-                            {{-- */$tur = $cur + $ptur;/* --}}
-                            {{-- */$tue = $cue + $ptue;/* --}}
-                            {{-- */$twgp = $wgp + $ptwgp;/* --}}
-                            {{-- */$cgpa = getGradePointAverage($twgp, $tur);/* --}}
-                            {{--<td><strong>GPA: {{ $studentGPA }}</strong></td>--}}
-{{--                            <td><strong>GPA: {{ $gpa }}</strong></td>--}}
-                            {{--<td><strong>Current CGPA: {{ $cgpa }}</strong></td>--}}
-                            {{--<td><strong>Current CGPA: {{ $studentCGPA }}</strong></td>--}}
-                            {{--<td><strong>Class of Degree: <em>{{ getClassOfDegree($studentCGPA) }}</em></strong></td>--}}
-                        {{--</tr>--}}
-                    {{--</table>--}}
-                {{--</div>--}}
-            {{--</div>--}}
+            <div class="panel panel-default">
+                <div class="panel-body" style="margin-top: 10px;">
+                    <table class="table table-bordered table-condensed">
+                        <tr class="text-center">
+                            <td><strong>GPA: {{ number_format($studentGPA,2) }}</strong></td>
+                            <td><strong>Current CGPA: {{ number_format($studentCGPA,2) }}</strong></td>
+                            <td><strong>Class of Degree: <em>{{ getClassOfDegree($studentCGPA) }}</em></strong></td>
+                        </tr>
+                        <tr class="hidden-print">
+                            <td colspan="3">
+                                <div class="alert alert-danger" style="margin-bottom: 0;">
+                                    <p>
+                                        <span class="glyphicon glyphicon-warning-sign"></span> <strong>NOTE</strong><br>
+                                        <h6>The Grade Point Average (GPA) and Cumulative Grade Point Average (CGPA) shown above is not an accurate representation of All your results. Only Results that have <strong>SENATE</strong> approval are displayed and used to calculate your GPA and CGPA. Your detailed results can be obtained from your Current Department.</h6>
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
             @elseif(request()->has('session_id') && request()->has('semester'))
                 <div class="panel panel-default">
                     <div class="panel-body" style="margin-top: 10px;">

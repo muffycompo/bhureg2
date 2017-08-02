@@ -64,6 +64,15 @@
     margin-top: 1%;
 }
 
+.normalCaExamHeader {
+    display: none;
+}
+
+.totalCaExamHeader {
+    display: inline-block;
+    width: inherit;
+}
+
 /*.alert-print {*/
     /*color: red;*/
     /*padding: 15px;*/
@@ -107,3 +116,4 @@
         color: #000 !important;
     }
 }
+

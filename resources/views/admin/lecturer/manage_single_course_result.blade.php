@@ -21,7 +21,7 @@
                                 {!! Form::hidden('session_id', $session_id) !!}
                                 {!! Form::hidden('semester_id', $semester_id) !!}
                                 {!! Form::hidden('alternate_entry', $alt_entry) !!}
-                                <p class="help-block">Make sure you have formatted your file as shown in this <a href="{{ route('admin.manage_download_csv_sample') }}">SAMPLE</a> CSV file.</p>
+                                <p class="help-block">Make sure you have formatted your file as shown in this <a href="{{ route('admin.manage_download_single_csv_sample') }}">SAMPLE</a> CSV file.</p>
                             </div>
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary pull-right">
@@ -56,7 +56,7 @@
                     <p>
                         <strong>Course: {{ $course_id }} - {{ courseTitleAndUnits($course_id) }}</strong>
                         @if(! isCourseResultFinalized($course_id,$session_id,$semester_id))
-                            <span class="pull-right"><a href="{{ route('admin.lecturer_manage_result',[encryptId($course_id),encryptId($session_id),encryptId($semester_id),encryptId(1)]) }}">Single Score Result Entry</a></span>
+                            <span class="pull-right"><a href="{{ route('admin.lecturer_manage_result',[encryptId($course_id),encryptId($session_id),encryptId($semester_id)]) }}">CA & Exam Score Result Entry</a></span>
                         @endif
                     </p>
                     <table class="table table-bordered table-condensed">
@@ -64,8 +64,7 @@
                             <th class="text-center">S/N</th>
                             <th class="text-center">Matriculation #</th>
                             <th class="text-center">Name</th>
-                            <th class="text-center" nowrap="nowrap">C.A (40%)</th>
-                            <th class="text-center" nowrap="nowrap">Exam (60%)</th>
+                            <th class="text-center" nowrap="nowrap">Exam (100%)</th>
                             @if(isCourseResultFinalized($course_id,$session_id,$semester_id))
                                 <th class="text-center">Total</th>
                                 <th class="text-center">Grade</th>
@@ -79,27 +78,18 @@
                                 <td nowrap="nowrap">{{ $course->students_student_id }}</td>
                                 <td nowrap="nowrap">{{ studentNameFromMatriculationNo($course->students_student_id) }}</td>
                                 @if(isCourseResultFinalized($course_id,$session_id,$semester_id))
-                                <td>{{ $course->ca }}</td>
                                 <td>{{ $course->exam }}</td>
                                 <td>
-                                    {{--*/ $total = $course->ca + $course->exam /*--}}
-                                    {{ $total }}
+                                    {{ $course->exam }}
                                 </td>
                                 <td>
-                                    {{ expandGrade($total) }}
+                                    {{ expandGrade($course->exam) }}
                                 </td>
                                 @else
                                     <td width="10%">
                                         <div class="row">
                                             <div class="col-md-10 col-xs-10 col-md-offset-1">
-                                                {!! Form::input('text','ca[]', $course->ca <= 40 ? $course->ca : 0,['class' => 'form-control']) !!}
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td width="10%">
-                                        <div class="row">
-                                            <div class="col-md-10 col-xs-10 col-md-offset-1">
-                                                {!! Form::input('text','exam[]', $course->exam <= 60 ? $course->exam : 0,['class' => 'form-control']) !!}
+                                                {!! Form::input('text','exam[]', $course->exam <= 100 ? $course->exam : 0,['class' => 'form-control']) !!}
                                             </div>
                                         </div>
                                     </td>

@@ -857,6 +857,22 @@ function getPreviousSession($sessionId){
     return $session ? $session->previous_session : $sessionId;
 }
 
+function studentSkippedSessionsList($studentId){
+    $sess = [];
+    $studentSessions = DB::connection('mysql2')->table('session_skiplist')
+        ->where('student_id',$studentId)
+        ->get(['session_id']);
+
+    if($studentSessions){
+        foreach ($studentSessions as $studentSession) {
+            $sess[] = $studentSession->session_id;
+        }
+        return $sess;
+    } else {
+        return $sess;
+    }
+}
+
 function studentResultSessions($studentId){
     $list = [];
     $sessions = DB::connection('mysql2')->table('course_registration')
@@ -896,8 +912,12 @@ function studentPreviousTotalUnitRegistered($studentId, $session, $semester)
     } else {
         $previousSessions = [];
         $sessions = studentResultSessions($studentId);
+        $skippedSessions = studentSkippedSessionsList($studentId);
 
-        while (in_array(getPreviousSession($session), $sessions)) {
+        while (
+            in_array(getPreviousSession($session), $sessions) ||
+            in_array(getPreviousSession($session), $skippedSessions)
+        ) {
             $session = getPreviousSession($session);
             $previousSessions[] = $session;
         }
@@ -906,10 +926,14 @@ function studentPreviousTotalUnitRegistered($studentId, $session, $semester)
 
         $units = DB::connection('mysql2')->table('course_registration')
             ->where('students_student_id', $studentId);
-        if (count($previousSessions) > 0 && is_array($previousSessions)) {
+        if (is_array($pSessions)) {
             $units->whereIn('sessions_session_id', $pSessions);
         } else {
             $units->where('sessions_session_id', $pSessions);
+        }
+
+        if(! is_array($pSessions) && $pSessions == currentAcademicSession()){
+            return $totalUnits;
         }
 
         $studentUnitsRegistered = $units->get(['courses_course_id']);
@@ -952,8 +976,12 @@ function studentPreviousTotalUnitsEarned($studentId, $session, $semester){
     } else {
         $previousSessions = [];
         $sessions = studentResultSessions($studentId);
+        $skippedSessions = studentSkippedSessionsList($studentId);
 
-        while (in_array(getPreviousSession($session), $sessions)) {
+        while (
+            in_array(getPreviousSession($session), $sessions) ||
+            in_array(getPreviousSession($session), $skippedSessions)
+        ) {
             $session = getPreviousSession($session);
             $previousSessions[] = $session;
         }
@@ -963,10 +991,14 @@ function studentPreviousTotalUnitsEarned($studentId, $session, $semester){
         $units = DB::connection('mysql2')->table('course_registration')
             ->where('students_student_id', $studentId)
             ->whereIn('approval_status',['Lecturer','HOD','Dean','Senate']);
-        if(count($previousSessions) > 0 && is_array($previousSessions)){
+        if(is_array($pSessions)){
             $units->whereIn('sessions_session_id', $pSessions);
         } else {
             $units->where('sessions_session_id', $pSessions);
+        }
+
+        if(! is_array($pSessions) && $pSessions == currentAcademicSession()){
+            return $totalUnits;
         }
 
         $studentUnitsEarned = $units->get(['courses_course_id','ca','exam','sessions_session_id']);
@@ -1033,8 +1065,12 @@ function studentPreviousTotalWGP($studentId, $session, $semester){
     } else {
         $previousSessions = [];
         $sessions = studentResultSessions($studentId);
+        $skippedSessions = studentSkippedSessionsList($studentId);
 
-        while (in_array(getPreviousSession($session), $sessions)) {
+        while (
+            in_array(getPreviousSession($session), $sessions) ||
+            in_array(getPreviousSession($session), $skippedSessions)
+        ) {
             $session = getPreviousSession($session);
             $previousSessions[] = $session;
         }
@@ -1044,10 +1080,15 @@ function studentPreviousTotalWGP($studentId, $session, $semester){
         $points = DB::connection('mysql2')->table('course_registration')
             ->where('students_student_id', $studentId)
             ->whereIn('approval_status',['Lecturer','HOD','Dean','Senate']);
-        if(count($previousSessions) > 0 && is_array($previousSessions)){
+        if(is_array($pSessions)){
             $points->whereIn('sessions_session_id', $pSessions);
         } else {
             $points->where('sessions_session_id', $pSessions);
+        }
+
+
+        if(! is_array($pSessions) && $pSessions == currentAcademicSession()){
+            return $qualityPoints;
         }
 
         $studentResults = $points->get(['courses_course_id','ca','exam','sessions_session_id']);

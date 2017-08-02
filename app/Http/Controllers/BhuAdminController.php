@@ -8,6 +8,7 @@ use App\Http\Requests\ChangePasswordFormRequest;
 use App\Http\Requests\HodManageAssignCourseRequest;
 use Excel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BhuAdminController extends Controller
 {
@@ -52,34 +53,44 @@ class BhuAdminController extends Controller
                     ->with(compact('courses'));
     }
 
-    public function lecturerManageCourseResult($courseId, $sessionId = null, $semesterId = null)
+    public function lecturerManageCourseResult($courseId, $sessionId = null, $semesterId = null, $isAltEntry = null)
     {
+        $lecturerId = session('user_id');
         $courseId = decryptId($courseId);
         $sessionId = !is_null($sessionId) ? decryptId($sessionId) : currentAcademicSession();
         $semesterId = !is_null($semesterId) ? decryptId($semesterId) : currentSemester();
+        $isAltEntry = !is_null($isAltEntry) ? decryptId($isAltEntry) : 0;
+
+        if((isAltEntryForResult($lecturerId,$courseId,$sessionId,true) == 1) || ($isAltEntry == 1)){
+            $view = 'admin.lecturer.manage_single_course_result';
+        } else {
+            $view = 'admin.lecturer.manage_course_result';
+        }
 
         $courses = lecturerManageCourseResult($courseId, $sessionId, $semesterId);
-        return view('admin.lecturer.manage_course_result')
+        return view($view)
                     ->with(compact('courses'))
                     ->with('course_id', $courseId)
                     ->with('session_id', $sessionId)
                     ->with('semester_id', $semesterId)
+                    ->with('alt_entry', $isAltEntry)
                     ->with('current_nav','manage_results')
                     ->with('sn',1);
     }
 
     public function postLecturerManageCourseResult(Request $request, CourseRegistration $courseRegistration)
     {
-        $cas = $request->only(['ca']);
+        $cas = $request->has('ca') ? $request->only(['ca']) : null;
         $exams = $request->only(['exam']);
         $students = $request->only(['student_id']);
         $courseId = $request->get('course_id');
         $hiddenSession = $request->get('session_id');
         $hiddenSemester = $request->get('semester_id');
+        $altEntry = $request->get('alternate_entry');
         $sessionId = $request->has('session_id') && !is_null($hiddenSession) ?  $hiddenSession : currentAcademicSession();
         $semesterId = $request->has('semester_id') && !is_null($hiddenSemester) ?  $hiddenSemester : currentSemester();
 
-        $courseRegistration->saveCourseResult($cas, $exams, $students, $courseId, $sessionId, $semesterId);
+        $courseRegistration->saveCourseResult($cas, $exams, $students, $courseId, $sessionId, $semesterId, $altEntry);
 
         return redirect()->back()->with([
             'flash_message' => 'Result for ' . $courseId . ' has been saved Successfully!',
@@ -92,10 +103,11 @@ class BhuAdminController extends Controller
         $courseId = $request->get('course_id');
         $hiddenSession = $request->get('session_id');
         $hiddenSemester = $request->get('semester_id');
+        $altEntry = $request->get('alternate_entry');
         $sessionId = $request->has('session_id') && !is_null($hiddenSession) ?  $hiddenSession : currentAcademicSession();
         $semesterId = $request->has('session_id') && !is_null($hiddenSemester) ?  $hiddenSemester : currentSemester();
 
-        $upload = $registration->uploadCourseResult($request, $courseId, $sessionId, $semesterId);
+        $upload = $registration->uploadCourseResult($request, $courseId, $sessionId, $semesterId, $altEntry);
         if($upload != false){
             return redirect()->back()->with([
                 'flash_message' => 'Result Uploaded Successfully!',
@@ -274,14 +286,22 @@ class BhuAdminController extends Controller
         $courseId = decryptId($courseId);
         $userId = decryptId($userId);
         $sessionId = currentAcademicSession();
+        $lecturerId = lecturerIdFromCourse($courseId,$sessionId);
+        $altEntry = isAltEntryForResult($lecturerId,$courseId,$sessionId,true);
 
+        if($altEntry == 1) {
+            $view = 'admin.hod.hod_manage_single_course_result';
+        } else {
+            $view = 'admin.hod.hod_manage_course_result';
+        }
         $courses = lecturerManageCourseResult($courseId, $sessionId, $semesterId);
-        return view('admin.hod.hod_manage_course_result')
+        return view($view)
             ->with(compact('courses'))
             ->with('course_id', $courseId)
             ->with('session_id', $sessionId)
             ->with('semester_id', $semesterId)
             ->with('user_id', $userId)
+            ->with('alternate_entry', $altEntry)
 //            ->with('current_nav','manage_adjustments')
             ->with('current_nav','manage_reports')
             ->with('sn',1);
@@ -290,6 +310,12 @@ class BhuAdminController extends Controller
     public function downloadSampleCsv()
     {
         $sampleFilePath = public_path('uploads') . '/RESULT_UPLOAD_SAMPLE.csv';
+        return response()->download($sampleFilePath);
+    }
+
+    public function downloadSingleSampleCsv()
+    {
+        $sampleFilePath = public_path('uploads') . '/RESULT_SINGLE_UPLOAD_SAMPLE.csv';
         return response()->download($sampleFilePath);
     }
 
@@ -354,12 +380,14 @@ class BhuAdminController extends Controller
 
     public function postHodManageCourseResult(Request $request, CourseRegistration $courseRegistration)
     {
-        $cas = $request->only(['ca']);
+//        $cas = $request->only(['ca']);
+        $cas = $request->has('ca') ? $request->only(['ca']) : null;
         $exams = $request->only(['exam']);
         $students = $request->only(['student_id']);
         $courseId = $request->get('course_id');
         $lecturerId = $request->get('lecturer_id');
         $semesterId = $request->get('semester_id');
+        $altEntry = $request->get('alternate_entry');
 
 //        $courseRegistration->saveCourseResultHod($lecturerId, $cas, $exams, $students, $courseId, currentAcademicSession(), currentSemester());
 //        $courseRegistration->saveCourseResultHod($cas, $exams, $students, $courseId, currentAcademicSession(), currentSemester());

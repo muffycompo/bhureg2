@@ -1186,3 +1186,23 @@ function getStudentLevel($studentId){
         ->first(['levelid']);
     return $level ? $level->levelid : null;
 }
+
+function isAltEntryForResult($lecturerId, $courseId, $sessionId, $value = false){
+    $altEntry = DB::connection('mysql2')->table('courses_lecturers')
+        ->where('users_user_id', $lecturerId)
+        ->where('courses_course_id', $courseId)
+        ->where('sessions_session_id', $sessionId)
+        ->first(['alternate_result_entry']);
+    if($value){
+        return $altEntry->alternate_result_entry;
+    }
+    return $altEntry && ($altEntry->alternate_result_entry == 1)? true : false;
+}
+
+function updateAltEntryForResult($lecturerId, $courseId, $sessionId, $altEntry){
+    DB::connection('mysql2')->table('courses_lecturers')
+        ->where('users_user_id', $lecturerId)
+        ->where('courses_course_id', $courseId)
+        ->where('sessions_session_id', $sessionId)
+        ->update(['alternate_result_entry' => is_null($altEntry) ? 0 : $altEntry]);
+}
