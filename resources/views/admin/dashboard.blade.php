@@ -8,8 +8,8 @@
                 <div class="panel-heading">Admin Staff Dashboard</div>
 
                 <div class="panel-body">
-                    <p>Welcome to your Dashboard, as a <strong>{{ session('role') }}</strong>, you can perform Administrative task!</p>
-                    @if(session('role') == 'Lecturer' or session('role') == 'HOD')
+                    <p>Welcome to your Dashboard, as a <strong>{{ session('role') == 'Transcript' ? 'Transcript Officer' : session('role') }}</strong>, you can perform Administrative task!</p>
+                    @if(session('role') == 'Lecturer' or session('role') == 'HOD' or session('role') == 'Transcript')
                         <p><strong>Department: {{ expandProgram(session('departments_department_id')) }}</strong></p>
                     @endif
                     <p><strong>Role: {{ session('role') }}</strong></p>

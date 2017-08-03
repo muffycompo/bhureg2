@@ -307,6 +307,12 @@ class BhuAdminController extends Controller
             ->with('sn',1);
     }
 
+    public function getNewTranscript()
+    {
+        return view('admin.transcript.new_transcript')
+                ->with('current_nav','manage_transcript');
+    }
+
     public function downloadSampleCsv()
     {
         $sampleFilePath = public_path('uploads') . '/RESULT_UPLOAD_SAMPLE.csv';
@@ -400,6 +406,13 @@ class BhuAdminController extends Controller
     }
 
     // END HOD AREA
+
+    public function postNewTranscript(Request $request)
+    {
+        $studentId = $request->get('matriculation_number');
+        $results = getStudentResultsTranscript($studentId);
+        return $results;
+    }
 
     public function postLogin(Request $request, BhuAdmin $admin)
     {

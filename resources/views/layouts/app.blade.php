@@ -127,14 +127,17 @@
                                 </ul>
                             </li>
                         @endif
-                        <!-- HOD: Admin Links -->
-                        @if(session()->has('role') && session('role') == 'HOD')
+
+                        @if(session('role') == 'Lecturer' or session('role') == 'HOD' or session('role') == 'Dean' or session('role') == 'Senate' or session('role') == 'Transcript')
                             <li class="{{ isset($current_nav) && $current_nav == 'dashboard' ? 'active' : '' }}">
                                 <a href="{{ route('admin.dashboard') }}">
                                     <span class="glyphicon glyphicon-home"></span>
                                     Dashboard
                                 </a>
                             </li>
+                        @endif
+                        <!-- HOD: Admin Links -->
+                        @if(session()->has('role') && session('role') == 'HOD')
                             <li class="{{ isset($current_nav) && $current_nav == 'manage_courses' ? 'active' : '' }}">
                                 <a href="{{ route('admin.hod_manage_courses') }}">
                                     <span class="glyphicon glyphicon-th-list"></span>
@@ -157,12 +160,12 @@
                         @endif
                         <!-- Lecturer: Admin Links -->
                         @if(session()->has('role') && session('role') == 'Lecturer')
-                            <li class="{{ isset($current_nav) && $current_nav == 'dashboard' ? 'active' : '' }}">
-                                <a href="{{ route('admin.dashboard') }}">
-                                    <span class="glyphicon glyphicon-home"></span>
-                                    Dashboard
-                                </a>
-                            </li>
+                            {{--<li class="{{ isset($current_nav) && $current_nav == 'dashboard' ? 'active' : '' }}">--}}
+                                {{--<a href="{{ route('admin.dashboard') }}">--}}
+                                    {{--<span class="glyphicon glyphicon-home"></span>--}}
+                                    {{--Dashboard--}}
+                                {{--</a>--}}
+                            {{--</li>--}}
                             <li class="{{ isset($current_nav) && $current_nav == 'manage_results' ? 'active' : '' }}">
                                 <a href="{{ route('admin.lecturer_manage_results') }}">
                                     <span class="glyphicon glyphicon-list-alt"></span>
@@ -173,25 +176,25 @@
                         <!-- End Lecturer: Admin Links -->
 
                         <!-- Dean: Admin Links -->
-                        @if(session()->has('role') && session('role') == 'Dean')
-                            <li class="{{ isset($current_nav) && $current_nav == 'dashboard' ? 'active' : '' }}">
-                                <a href="{{ route('admin.dashboard') }}">
-                                    <span class="glyphicon glyphicon-home"></span>
-                                    Dashboard
-                                </a>
-                            </li>
-                        @endif
+                        {{--@if(session()->has('role') && session('role') == 'Dean')--}}
+                            {{--<li class="{{ isset($current_nav) && $current_nav == 'dashboard' ? 'active' : '' }}">--}}
+                                {{--<a href="{{ route('admin.dashboard') }}">--}}
+                                    {{--<span class="glyphicon glyphicon-home"></span>--}}
+                                    {{--Dashboard--}}
+                                {{--</a>--}}
+                            {{--</li>--}}
+                        {{--@endif--}}
                         <!-- End Dean: Admin Links -->
 
                         <!-- Senate: Admin Links -->
-                        @if(session()->has('role') && session('role') == 'Senate')
-                            <li class="{{ isset($current_nav) && $current_nav == 'dashboard' ? 'active' : '' }}">
-                                <a href="{{ route('admin.dashboard') }}">
-                                    <span class="glyphicon glyphicon-home"></span>
-                                    Dashboard
-                                </a>
-                            </li>
-                            @endif
+                        {{--@if(session()->has('role') && session('role') == 'Senate')--}}
+                            {{--<li class="{{ isset($current_nav) && $current_nav == 'dashboard' ? 'active' : '' }}">--}}
+                                {{--<a href="{{ route('admin.dashboard') }}">--}}
+                                    {{--<span class="glyphicon glyphicon-home"></span>--}}
+                                    {{--Dashboard--}}
+                                {{--</a>--}}
+                            {{--</li>--}}
+                        {{--@endif--}}
                         <!-- End Senate: Admin Links -->
 
                         @if(session('role') == 'HOD' or session('role') == 'Dean' or session('role') == 'Senate')
@@ -219,7 +222,17 @@
                                 </ul>
                             </li>
                         @endif
-                        @if(session('role') == 'Lecturer' or session('role') == 'HOD' or session('role') == 'Dean' or session('role') == 'Senate')
+                        <!-- Transcript: Admin Links -->
+                        @if(session()->has('role') && session('role') == 'Transcript')
+                            <li class="{{ isset($current_nav) && $current_nav == 'manage_transcript' ? 'active' : '' }}">
+                                <a href="{{ route('admin.get_new_transcript') }}">
+                                    <span class="glyphicon glyphicon-list"></span>
+                                    Generate Transcript
+                                </a>
+                            </li>
+                        @endif
+                        <!-- END Transcript: Admin Links -->
+                        @if(session('role') == 'Lecturer' or session('role') == 'HOD' or session('role') == 'Dean' or session('role') == 'Senate' or session('role') == 'Transcript')
                             <li class="dropdown {{ isset($current_nav) && $current_nav == 'user_settings' ? 'active' : '' }}">
                                 <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                                     <span class="glyphicon glyphicon-user"></span>

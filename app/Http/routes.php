@@ -67,6 +67,11 @@ Route::get('/admin/manage_finalize_level_result/{deptId}/{sessionId}/{semesterId
 
 // End Reports Section
 
+// Transcript Section
+Route::get('/admin/new_transcript',['as' => 'admin.get_new_transcript', 'uses' => 'BhuAdminController@getNewTranscript']);
+Route::post('/admin/new_transcript',['as' => 'admin.post_new_transcript', 'uses' => 'BhuAdminController@postNewTranscript']);
+// End Transcript Section
+
 Route::get('/admin/change_password', ['as' => 'admin.change_password', 'uses' => 'BhuAdminController@getChangePassword']);
 Route::post('/admin/change_password', ['as' => 'admin.post_change_password', 'uses' => 'BhuAdminController@postChangePassword']);
 

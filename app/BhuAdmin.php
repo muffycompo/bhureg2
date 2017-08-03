@@ -18,7 +18,7 @@ class BhuAdmin extends Model
         $password = md5($data['password']);
         $user = $this->where('user_id', $username)
             ->where('pwd', $password)
-            ->whereIn('role',['Lecturer','HOD','Dean','Senate'])
+            ->whereIn('role',['Lecturer','HOD','Dean','Senate','Transcript'])
             ->first();
 
         if($user) {

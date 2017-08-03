@@ -59,19 +59,20 @@
                         @endif
                         @if(count($carryovers) > 0)
                             @foreach($carryovers as $carryover)
-                                <tr class="text-center">
-                                    <?php $units = $units + (int) courseTitleAndUnits($carryover['courses_course_id'],true); ?>
-                                    <td>{{ $sn++ }}</td>
-                                    <td>{{ $carryover['courses_course_id'] }}</td>
-                                    <td nowrap="nowrap">{{ courseTitleAndUnits($carryover['courses_course_id']) }}</td>
-                                    <td>{{ courseTitleAndUnits($carryover['courses_course_id'],true) }}</td>
-                                    <td>{{ expandCourseType($carryover['courses_course_id']) }}</td>
-                                    <td>
-                                        <strong>CO</strong>
-                                        {!! Form::hidden('course_id[]',$carryover['courses_course_id']) !!}
-                                    </td>
-
-                                </tr>
+                                @if(studentSemesterFromCourseId($carryover['courses_course_id'], $carryover['sessions_session_id']) == currentSemester())
+                                    <tr class="text-center">
+                                        <?php $units = $units + (int) courseTitleAndUnits($carryover['courses_course_id'],true); ?>
+                                        <td>{{ $sn++ }}</td>
+                                        <td>{{ $carryover['courses_course_id'] }}</td>
+                                        <td nowrap="nowrap">{{ courseTitleAndUnits($carryover['courses_course_id']) }}</td>
+                                        <td>{{ courseTitleAndUnits($carryover['courses_course_id'],true) }}</td>
+                                        <td>{{ expandCourseType($carryover['courses_course_id']) }}</td>
+                                        <td>
+                                            <strong>CO</strong>
+                                            {!! Form::hidden('course_id[]',$carryover['courses_course_id']) !!}
+                                        </td>
+                                    </tr>
+                                @endif
                             @endforeach
                         @endif
                         @if(count($courses) > 0 or count($carryovers) > 0)

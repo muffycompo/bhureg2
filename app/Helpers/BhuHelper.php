@@ -191,7 +191,7 @@ function carryOverCoursesStudents($regno, $sessionId, $semester){
             ->where('approval_status','Senate')
 //            ->where('sessions_session_id',$sessionId)
             ->where('students_student_id',$regno)
-            ->where('semester',$semester);
+            ->whereIn('semester',[$semester,4]);
 //    if(!is_null($semester)) {
 //        is_array($semester) ? $courses->whereIn('semester', $semester) : $courses->where('semester',$semester);
 //    }
@@ -232,7 +232,7 @@ function carryOverCoursesStudents($regno, $sessionId, $semester){
         }
     }
 
-    // Reset fetch type to Object
+    // Reset Set fetch type to Objects
     DB::connection('mysql2')->setFetchMode(PDO::FETCH_OBJ);
 
     return $results;
@@ -296,6 +296,7 @@ function expandProgram($deptId){
     if($deptId == 'LIB') return 'Library Information System Unit';
     if($deptId == 'MTH') return 'Mathematics';
     if($deptId == 'EPS') return 'Enterpreneurship Studies Unit';
+    if($deptId == 'ZOO') return 'Academic Transcript Unit';
 //    $programs = DB::connection('mysql2')->table('programs')->where('department_id', $deptId)->first();
     $programs = DB::connection('mysql2')->table('programs')->where('program_id', $deptId)->first();
 //    return $programs->department_name;
@@ -1091,6 +1092,17 @@ function semesterFromCourseId($courseId, $sessionId){
     return $semester ? $semester->semester : currentSemester();
 }
 
+function studentSemesterFromCourseId($courseId,$sessionId){
+//    DB::connection('mysql2')->setFetchMode(PDO::FETCH_OBJ);
+    $deptId = formatDeptId(session('deptid'));
+    $semester = DB::connection('mysql2')->table('department_courses')
+        ->where('session_session_id', $sessionId)
+        ->where('courses_course_id', $courseId)
+        ->where('course_program', $deptId)
+        ->first(['semester']);
+    return $semester ? $semester->semester : currentSemester();
+}
+
 function isCourseRegistrationEnabled(){
     $registrationStatus = DB::connection('mysql2')->table('utilities')
                     ->where('utility_id', 'registration_status')
@@ -1205,4 +1217,12 @@ function updateAltEntryForResult($lecturerId, $courseId, $sessionId, $altEntry){
         ->where('courses_course_id', $courseId)
         ->where('sessions_session_id', $sessionId)
         ->update(['alternate_result_entry' => is_null($altEntry) ? 0 : $altEntry]);
+}
+
+function getStudentResultsTranscript($studentId){
+    return DB::connection('mysql2')->table('course_registration')
+        ->where('students_student_id', $studentId)
+        ->whereIn('approval_status', ['Lecturer','HOD','Dean','Senate'])
+        ->orderBy('sessions_session_id')
+        ->get();
 }
