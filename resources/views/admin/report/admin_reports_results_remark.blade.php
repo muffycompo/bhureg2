@@ -60,6 +60,9 @@
                                         <th>TWGP</th>
                                         <th>CGPA</th>
                                         <th>Remark</th>
+                                        @if($classOfDegree == 1)
+                                            <th>Class of Degree</th>
+                                        @endif
                                     </tr>
                                     @foreach($registeredStudents as $student)
                                     <tr>
@@ -119,6 +122,12 @@
                                         <td>
                                             {{ getRemarkCarryOvers($student->regno, $sessionId, $semesterId) }}
                                         </td>
+                                        @if($classOfDegree == 1)
+                                            <td class="text-center" nowrap="nowrap">
+                                                {{-- */$cgpa = studentTotalCGPA($twgp, $tur);/* --}}
+                                                {{ getClassOfDegree($cgpa) }}
+                                            </td>
+                                        @endif
                                     </tr>
                                     @endforeach
                                 @endif

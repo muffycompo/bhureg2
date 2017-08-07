@@ -161,7 +161,7 @@ class BhuAdminReportController extends Controller
                     ->with(compact('registeredStudents'));
     }
 
-    public function manageAdminRemarkCourseResults($deptId, $sessionId, $semesterId, $levelId)
+    public function manageAdminRemarkCourseResults($deptId, $sessionId, $semesterId, $levelId, $classOfDegree = null)
     {
         $deptId = decryptId($deptId);
         $sessionId = decryptId($sessionId);
@@ -174,6 +174,7 @@ class BhuAdminReportController extends Controller
                     ->with(compact('semesterId'))
                     ->with(compact('levelId'))
                     ->with(compact('deptId'))
+                    ->with(compact('classOfDegree'))
                     ->with('sn',1)
                     ->with(compact('registeredStudents'));
     }
@@ -186,10 +187,11 @@ class BhuAdminReportController extends Controller
         $semesterId = encryptId($request->get('semester'));
         $levelId = encryptId($request->get('level_id'));
         $reportType = $request->get('report');
+        $classOfDegree = request()->has('with_class_of_degree')? request()->get('with_class_of_degree') : 0;
 
-        if($reportType == 'detailed_result') return redirect()->route('admin.report_detailed_results',[$deptId,$sessionId,$semesterId,$levelId]);
-        if($reportType == 'detailed_summary') return redirect()->route('admin.report_results_summary',[$deptId,$sessionId,$semesterId,$levelId]);
-        if($reportType == 'detailed_remark') return redirect()->route('admin.report_results_remark',[$deptId,$sessionId,$semesterId,$levelId]);
+        if($reportType == 'detailed_result') return redirect()->route('admin.report_detailed_results',[$deptId,$sessionId,$semesterId,$levelId,$classOfDegree]);
+        if($reportType == 'detailed_summary') return redirect()->route('admin.report_results_summary',[$deptId,$sessionId,$semesterId,$levelId,$classOfDegree]);
+        if($reportType == 'detailed_remark') return redirect()->route('admin.report_results_remark',[$deptId,$sessionId,$semesterId,$levelId,$classOfDegree]);
         return redirect()->back();
     }
 }

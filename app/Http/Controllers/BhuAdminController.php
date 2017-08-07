@@ -313,6 +313,20 @@ class BhuAdminController extends Controller
                 ->with('current_nav','manage_transcript');
     }
 
+    public function studentAcademicTranscript()
+    {
+        $transcriptResults = session()->has('transcriptResults') ? session('transcriptResults') : null;
+        $studentId = session()->has('studentId') ? session('studentId') : null;
+        $student = getStudentBiodata($studentId);
+        return view('admin.transcript.student_transcript')
+                ->with('current_nav','manage_transcript')
+                ->with('units',0)
+                ->with('units_earned',0)
+                ->with('grade_point',0)
+                ->with(compact('student'))
+                ->with(compact('transcriptResults'));
+    }
+    
     public function downloadSampleCsv()
     {
         $sampleFilePath = public_path('uploads') . '/RESULT_UPLOAD_SAMPLE.csv';
@@ -411,7 +425,9 @@ class BhuAdminController extends Controller
     {
         $studentId = $request->get('matriculation_number');
         $results = getStudentResultsTranscript($studentId);
-        return $results;
+        return redirect()->route('admin.get_student_transcript')
+                ->with('transcriptResults',$results)
+                ->with('studentId',$studentId);
     }
 
     public function postLogin(Request $request, BhuAdmin $admin)

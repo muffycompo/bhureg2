@@ -62,13 +62,14 @@ Route::get('/admin/manage_course_result_hod/{courseId}/{sessionId}/{semesterId}'
 Route::get('/admin/manage_approve_course_result/{courseId}/{sessionId}/{semesterId}', ['as' => 'admin.report_approve_manage_result', 'uses' => 'BhuAdminReportController@manageAdminApproveCourseResults']);
 Route::get('/admin/manage_detailed_results/{deptId}/{sessionId}/{semesterId}/{levelId}', ['as' => 'admin.report_detailed_results', 'uses' => 'BhuAdminReportController@manageAdminDetailedCourseResults']);
 Route::get('/admin/manage_results_summary/{deptId}/{sessionId}/{semesterId}/{levelId}', ['as' => 'admin.report_results_summary', 'uses' => 'BhuAdminReportController@manageAdminSummaryCourseResults']);
-Route::get('/admin/manage_results_remark/{deptId}/{sessionId}/{semesterId}/{levelId}', ['as' => 'admin.report_results_remark', 'uses' => 'BhuAdminReportController@manageAdminRemarkCourseResults']);
+Route::get('/admin/manage_results_remark/{deptId}/{sessionId}/{semesterId}/{levelId}/{classOfDegree?}', ['as' => 'admin.report_results_remark', 'uses' => 'BhuAdminReportController@manageAdminRemarkCourseResults']);
 Route::get('/admin/manage_finalize_level_result/{deptId}/{sessionId}/{semesterId}/{levelId}', ['as' => 'admin.report_finalize_level_result', 'uses' => 'BhuAdminReportController@manageFinalizeLevelResult']);
 
 // End Reports Section
 
 // Transcript Section
 Route::get('/admin/new_transcript',['as' => 'admin.get_new_transcript', 'uses' => 'BhuAdminController@getNewTranscript']);
+Route::get('/admin/student_transcript',['as' => 'admin.get_student_transcript', 'uses' => 'BhuAdminController@studentAcademicTranscript']);
 Route::post('/admin/new_transcript',['as' => 'admin.post_new_transcript', 'uses' => 'BhuAdminController@postNewTranscript']);
 // End Transcript Section
 

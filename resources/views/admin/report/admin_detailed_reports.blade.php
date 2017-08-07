@@ -43,6 +43,10 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12 col-xs-12">
+                            <div class="form-group">
+                                <label for="level_id">With Class of Degree</label>
+                                {!! Form::checkbox('with_class_of_degree',1) !!}
+                            </div>
                             <button type="submit" name="report" value="detailed_result" class="btn btn-info" style="margin-bottom: 10px;">
                                 <span class="glyphicon glyphicon-paperclip"></span>
                                 Detailed Result Page

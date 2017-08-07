@@ -1220,9 +1220,111 @@ function updateAltEntryForResult($lecturerId, $courseId, $sessionId, $altEntry){
 }
 
 function getStudentResultsTranscript($studentId){
-    return DB::connection('mysql2')->table('course_registration')
+    $results = [];
+    $sessions = getStudentRegistrationSessions($studentId);
+
+    if(count($sessions) > 0){
+        $transcriptResults = DB::connection('mysql2')->table('course_registration')
+            ->where('students_student_id', $studentId)
+            ->whereIn('approval_status', ['Lecturer','HOD','Dean','Senate'])
+            ->orderBy('sessions_session_id')
+            ->get();
+
+        foreach ($sessions as $session) {
+            foreach ($transcriptResults as $transcriptResult) {
+                if($transcriptResult->sessions_session_id == $session->sessions_session_id){
+                    $results[$session->sessions_session_id][] = $transcriptResult;
+                }
+            }
+        }
+    }
+
+    return $results;
+}
+
+function getStudentRegistrationSessions($studentId){
+    $sessions = DB::connection('mysql2')->table('course_registration')
         ->where('students_student_id', $studentId)
         ->whereIn('approval_status', ['Lecturer','HOD','Dean','Senate'])
-        ->orderBy('sessions_session_id')
-        ->get();
+        ->groupBy('sessions_session_id')
+        ->get(['sessions_session_id']);
+
+    return $sessions;
+}
+
+function expandTranscriptGradeRemark($score, $studentId = null){
+    if(! is_null($studentId)){
+        if(isOldGradable($studentId)){
+            $grade = expandGrade($score,true);
+        } else {
+            $grade = expandGrade($score);
+        }
+
+        if(
+            $grade == 'A' ||
+            $grade == 'B' ||
+            $grade == 'C' ||
+            $grade == 'D' ||
+            $grade == 'E'
+        ){
+            return 'P';
+        } else {
+            return 'Rpt';
+        }
+    }
+}
+
+function transcriptStartDate($studentId){
+    return transcriptDate($studentId);
+}
+
+function transcriptEndDate($studentId){
+    return transcriptDate($studentId, 'DESC');
+}
+
+function transcriptDate($studentId, $order = 'ASC') {
+    $session = DB::connection('mysql2')->table('course_registration')
+        ->where('students_student_id', $studentId)
+//        ->whereIn('approval_status', ['Lecturer','HOD','Dean','Senate'])
+        ->orderBy('sessions_session_id',$order)
+        ->first(['sessions_session_id']);
+
+    return $session ? $session->sessions_session_id : '';
+}
+
+function getStudentBiodata($studentId){
+    return DB::connection('mysql')->table('studentbiodata')
+        ->where('regno', $studentId)
+        ->first();
+}
+
+function expandGender($genderId){
+    if(! is_null($genderId)){
+        return $genderId == 'M' ? 'Male' : 'Female';
+    }
+    return '';
+}
+
+function graduateStatus($graduationStatus, $levelId = null){
+    if(! is_null($levelId)){
+        if(str_contains($levelId, 'Graduate')){
+            return 'Graduated';
+        }
+    }
+
+    if($graduationStatus == 'G'){
+        return 'Graduated';
+    } elseif ($graduationStatus == 'C' or $graduationStatus == 'C'){
+        return 'Current Student';
+    } else {
+        return '';
+    }
+}
+
+function expandProgramSpecialization($deptId){
+    if($deptId == 'MED' or $deptId == 'MBBS') return 'Medicine & Surgery';
+    if($deptId == 'MIC' or $deptId == 'BIOS') return 'B.Sc Microbiology';
+
+    $program = DB::connection('mysql2')->table('programs')->where('program_id', $deptId)->first();
+    return $program->degree . ' ' . $program->program_name;
 }
