@@ -96,16 +96,18 @@ function carryOverCoursesRemark($regno, $sessionId){
             // 40 Passmark for BHU/11 and below
             if(isOldGradable($score['students_student_id'])){
                 if(max($score['total_score']) < 40 && in_array($score['courses_course_id'],$results) == false){
+                    $results[$score['courses_course_id']] = $score;
                     // Only Get Core Courses
-                    if(isCourseCore($score['courses_course_id'],$sessionId)){
-                        $results[$score['courses_course_id']] = $score;
-                    }
+//                    if(isCourseCore($score['courses_course_id'],$sessionId)){
+//
+//                    }
                 }
             } else {
                 if(max($score['total_score']) < 45 && in_array($score['courses_course_id'],$results) == false){
-                    if(isCourseCore($score['courses_course_id'],$sessionId)){
-                        $results[$score['courses_course_id']] = $score;
-                    }
+                    $results[$score['courses_course_id']] = $score;
+//                    if(isCourseCore($score['courses_course_id'],$sessionId)){
+//
+//                    }
                 }
             }
 
@@ -1327,4 +1329,10 @@ function expandProgramSpecialization($deptId){
 
     $program = DB::connection('mysql2')->table('programs')->where('program_id', $deptId)->first();
     return $program->degree . ' ' . $program->program_name;
+}
+
+function studentHasRegisteredForAnyCourse($studentId){
+    return DB::connection('mysql2')->table('course_registration')
+                ->where('students_student_id', $studentId)
+                ->count(['courses_course_id']);
 }

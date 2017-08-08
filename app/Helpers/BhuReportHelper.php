@@ -571,18 +571,22 @@ function getGradePointAverage($upper, $lower){
 }
 
 function getRemarkCarryOvers($studentId, $sessionId, $semesterId){
-    if(hasDoneCourseRegistration($studentId, $sessionId, $semesterId)){
-        $results = carryOverCoursesRemark($studentId,$sessionId);
-        if(count($results) > 0){
-            $carryOverStr = '';
-            foreach ($results as $code => $result) {
-                $carryOverStr .= $code . ', ';
-            }
-            return rtrim($carryOverStr, ', ');
-        } else {
+    $carryOverStr = '';
+    if(! hasDoneCourseRegistration($studentId, $sessionId, $semesterId)){
+        $carryOverStr .= "Not Registered<br>";
+    }
+//        $results = carryOverCoursesRemark($studentId,$sessionId);
+    $results = carryOverCoursesStudents($studentId,$sessionId,$semesterId);
+    $unitRegistered = studentCurrentUnitsRegistered($studentId,$sessionId,$semesterId);
+    if(count($results) > 0){
+        foreach ($results as $code => $result) {
+            $carryOverStr .= $code . ', ';
+        }
+        return rtrim($carryOverStr, ', ');
+    } else {
+        if($unitRegistered > 0){
             return 'Pass';
         }
-    } else {
         return 'Not Registered';
     }
 

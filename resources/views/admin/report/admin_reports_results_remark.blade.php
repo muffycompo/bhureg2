@@ -120,7 +120,7 @@
 {{--                                            {{ studentCGPA($student->regno) }}--}}
                                         </td>
                                         <td>
-                                            {{ getRemarkCarryOvers($student->regno, $sessionId, $semesterId) }}
+                                            {!! getRemarkCarryOvers($student->regno, $sessionId, $semesterId) !!}
                                         </td>
                                         @if($classOfDegree == 1)
                                             <td class="text-center" nowrap="nowrap">
