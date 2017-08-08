@@ -139,7 +139,7 @@
                                 <div class="alert alert-danger" style="margin-bottom: 0;">
                                     <p>
                                         <span class="glyphicon glyphicon-warning-sign"></span> <strong>NOTE</strong><br>
-                                        <h6>The Grade Point Average (GPA) and Cumulative Grade Point Average (CGPA) shown above is not an accurate representation of All your results. Only Results that have <strong>SENATE</strong> approval are displayed and used to calculate your GPA and CGPA. Your detailed results can be obtained from your Current Department.</h6>
+                                        <h6>The Grade Point Average (GPA) and Cumulative Grade Point Average (CGPA) shown above is a mere representation of only <strong>APPROVED</strong> results. To emphasize once more, only Results that have <strong>SENATE APPROVAL</strong> are displayed and used to calculate your GPA and CGPA. Your detailed results can be obtained from your Current Department.</h6>
                                     </p>
                                 </div>
                             </td>
