@@ -192,8 +192,8 @@ function carryOverCoursesStudents($regno, $sessionId, $semester){
             ->select(DB::raw('*,(ca + exam) AS total_score'))
             ->where('approval_status','Senate')
 //            ->where('sessions_session_id',$sessionId)
-            ->where('students_student_id',$regno)
-            ->whereIn('semester',[$semester,4]);
+            ->where('students_student_id',$regno);
+//            ->whereIn('semester',[$semester,4]);
 //    if(!is_null($semester)) {
 //        is_array($semester) ? $courses->whereIn('semester', $semester) : $courses->where('semester',$semester);
 //    }

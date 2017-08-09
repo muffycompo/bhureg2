@@ -575,8 +575,8 @@ function getRemarkCarryOvers($studentId, $sessionId, $semesterId){
     if(! hasDoneCourseRegistration($studentId, $sessionId, $semesterId)){
         $carryOverStr .= "Not Registered<br>";
     }
-//        $results = carryOverCoursesRemark($studentId,$sessionId);
-    $results = carryOverCoursesStudents($studentId,$sessionId,$semesterId);
+    $results = carryOverCoursesRemark($studentId,$sessionId);
+//    $results = carryOverCoursesStudents($studentId,$sessionId,$semesterId);
     $unitRegistered = studentCurrentUnitsRegistered($studentId,$sessionId,$semesterId);
     if(count($results) > 0){
         foreach ($results as $code => $result) {
