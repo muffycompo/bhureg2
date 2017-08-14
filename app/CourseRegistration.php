@@ -96,7 +96,7 @@ class CourseRegistration extends Model
 
         // Update Alternate Entry
         $lectureId = lecturerIdFromCourse($courseId,$session);
-        updateAltEntryForResult($lectureId,$courseId,$session,$altEntry);
+        //updateAltEntryForResult($lectureId,$courseId,$session,$altEntry);
 
     }
 
@@ -173,7 +173,7 @@ class CourseRegistration extends Model
                 }
                 // Update Alternate Entry
                 $lectureId = lecturerIdFromCourse($courseId,$session);
-                updateAltEntryForResult($lectureId,$courseId,$session,$altEntry);
+                //updateAltEntryForResult($lectureId,$courseId,$session,$altEntry);
             }
 
             return true;

@@ -1202,6 +1202,7 @@ function getStudentLevel($studentId){
 }
 
 function isAltEntryForResult($lecturerId, $courseId, $sessionId, $value = false){
+    return false;
     $altEntry = DB::connection('mysql2')->table('courses_lecturers')
         ->where('users_user_id', $lecturerId)
         ->where('courses_course_id', $courseId)
@@ -1214,6 +1215,7 @@ function isAltEntryForResult($lecturerId, $courseId, $sessionId, $value = false)
 }
 
 function updateAltEntryForResult($lecturerId, $courseId, $sessionId, $altEntry){
+    return;
     DB::connection('mysql2')->table('courses_lecturers')
         ->where('users_user_id', $lecturerId)
         ->where('courses_course_id', $courseId)
