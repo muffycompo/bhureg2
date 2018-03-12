@@ -186,6 +186,9 @@ class CourseRegistration extends Model
     {
         $sn = 1;
         $titleArray[] = [
+            'Students Result for ' . $courseId,
+        ];
+        $titleArray[] = [
             'S/N',
             'Matriculation #',
             'Name',
@@ -212,13 +215,22 @@ class CourseRegistration extends Model
 
         $exportArray = array_merge($titleArray, $dataArray);
 
-        Excel::create($courseId . '_Results', function($excel) use($exportArray, $courseId) {
+        Excel::create($courseId . '_Results', function($excel) use($exportArray, $courseId, $ext) {
 
-            $excel->sheet($courseId . '_Results', function($sheet) use($exportArray) {
+            $excel->sheet($courseId . '_Results', function($sheet) use($exportArray, $ext) {
 
                 $sheet->fromArray($exportArray, null, 'A1', true, false);
                 $sheet->setPageMargin(0.25);
+                $sheet->mergeCells('A1:G1');
+                $sheet->setAutoSize(true);
+                if ($ext != 'pdf'){
+                    $sheet->setAllBorders(\PHPExcel_Style_Border::BORDER_THIN);
+                }
                 $sheet->cells('A1:G1', function($cells) {
+                    $cells->setFontWeight('bold');
+                    $cells->setAlignment('center');
+                });
+                $sheet->cells('A2:G2', function($cells) {
                     $cells->setFontWeight('bold');
                     $cells->setAlignment('center');
                 });
@@ -228,16 +240,73 @@ class CourseRegistration extends Model
                     )
                 );
 
+              $sheet->getDefaultStyle()->applyFromArray($style);
+
+              $sheet->setSize('A2', 5);
+              $sheet->setSize('B2', 25);
+              $sheet->setSize('D2', 10);
+              $sheet->setSize('E2', 10);
+              $sheet->setSize('F2', 10);
+              $sheet->setSize('G2', 10);
+
+            });
+
+        })->export($ext);
+    }
+
+    public function exportRegisteredStudentsForCourses($courses, $courseId, $ext = 'xlsx')
+    {
+        $sn = 1;
+        $titleArray[] = [
+            'List of Registered Student(s) for ' . $courseId,
+        ];
+        $titleArray[] = [
+            'S/N',
+            'Matriculation #',
+            'Name',
+        ];
+
+        $dataArray = [];
+        if(count($courses) > 0){
+            foreach ($courses as $course){
+                $dataArray[] = [
+                    $sn++,
+                    $course->students_student_id,
+                    studentNameFromMatriculationNo($course->students_student_id),
+                ];
+            }
+        }
+
+        $exportArray = array_merge($titleArray, $dataArray);
+
+        Excel::create($courseId . '_Registered_Students', function($excel) use($exportArray, $courseId, $ext) {
+
+            $excel->sheet($courseId . '_Reg_Students', function($sheet) use($exportArray, $ext) {
+
+                $sheet->fromArray($exportArray, null, 'A1', true, false);
+                $sheet->setPageMargin(0.25);
+                $sheet->mergeCells('A1:C1');
+                $sheet->setAutoSize(true);
+                if($ext != 'pdf') {
+                    $sheet->setAllBorders(\PHPExcel_Style_Border::BORDER_THIN);
+                }
+                $sheet->cells('A1:C1', function($cells) {
+                    $cells->setFontWeight('bold');
+                    $cells->setAlignment('center');
+                });
+                $sheet->cells('A2:C2', function($cells) {
+                    $cells->setFontWeight('bold');
+                    $cells->setAlignment('center');
+                });
+                $style = [
+                    'alignment' => [
+                        'horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                    ]
+                ];
+
                 $sheet->getDefaultStyle()->applyFromArray($style);
-
-              $sheet->setSize('A1', 5);
-              $sheet->setSize('B1', 25);
-              $sheet->setSize('C1', 25);
-              $sheet->setSize('D1', 10);
-              $sheet->setSize('E1', 10);
-              $sheet->setSize('F1', 10);
-              $sheet->setSize('G1', 10);
-
+                $sheet->setSize('A2',10);
+                $sheet->setSize('B2',25);
             });
 
         })->export($ext);

@@ -57,7 +57,7 @@
                                 <td>{{ $course->exam }}</td>
                                 <td>
                                     {{--*/ $total = $course->ca + $course->exam /*--}}
-                                    {{ $total }}
+                                    {{ roundNumberUp($total) }}
                                 </td>
                                 <td>
                                     {{ expandGrade($total) }}

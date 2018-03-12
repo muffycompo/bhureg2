@@ -111,7 +111,7 @@
                                                 <td>{{ courseTitleAndUnits($result->courses_course_id) }}</td>
                                                 <td>{{ courseTitleAndUnits($result->courses_course_id, true) }}</td>
                                                 {{-- */$total = $result->ca + $result->exam;/* --}}
-                                                <td>{{ $total }}</td>
+                                                <td>{{ roundNumberUp($total) }}</td>
                                                 <td>{{ expandGrade($total) }}</td>
 
                                             </tr>

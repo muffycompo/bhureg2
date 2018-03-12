@@ -73,6 +73,9 @@ Route::get('/admin/student_transcript',['as' => 'admin.get_student_transcript', 
 Route::post('/admin/new_transcript',['as' => 'admin.post_new_transcript', 'uses' => 'BhuAdminController@postNewTranscript']);
 // End Transcript Section
 
+// General Routes
+Route::get('/admin/download/registered_students/{courseId}/{sessionId}/{semesterId}', ['as' => 'admin.download_registered_students', 'uses' => 'BhuAdminController@downloadRegisteredStudents']);
+
 Route::get('/admin/change_password', ['as' => 'admin.change_password', 'uses' => 'BhuAdminController@getChangePassword']);
 Route::post('/admin/change_password', ['as' => 'admin.post_change_password', 'uses' => 'BhuAdminController@postChangePassword']);
 
@@ -84,5 +87,5 @@ Route::post('/admin/login', ['as' => 'admin.post_login', 'uses' => 'BhuAdminCont
 // POST routes
 Route::post('/register', ['as' => 'post.register', 'uses' => 'BhuLoginController@postRegister']);
 
-//Route::get('/demo',['as' => 'get.demo', 'uses' => 'BhuAdminController@getDemo']);
+Route::get('/demo',['as' => 'get.demo', 'uses' => 'BhuAdminController@getDemo']);
 Route::get('/biodata_update',['as' => 'get.demo', 'uses' => 'BhuAdminController@getBiodataUpdate']);

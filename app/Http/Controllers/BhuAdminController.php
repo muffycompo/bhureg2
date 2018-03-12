@@ -9,12 +9,13 @@ use App\Http\Requests\HodManageAssignCourseRequest;
 use Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Crypt;
 
 class BhuAdminController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth.admin', ['except' => ['getLogin','postLogin','getLogout','getBiodataUpdate']]);
+        $this->middleware('auth.admin', ['except' => ['getLogin','postLogin','getLogout','getBiodataUpdate','getDemo']]);
     }
 
     public function getLogin()
@@ -339,6 +340,20 @@ class BhuAdminController extends Controller
         return response()->download($sampleFilePath);
     }
 
+    public function downloadRegisteredStudents($courseId, $sessionId, $semesterId, CourseRegistration $courseRegistration)
+    {
+        $courseId = decryptId($courseId);
+        $sessionId = decryptId($sessionId);
+        $semesterId = decryptId($semesterId);
+
+        $courses = lecturerManageCourseResult($courseId, $sessionId, $semesterId);
+//        $ext = 'xlsx';
+        $ext = 'pdf';
+
+        $courseRegistration->exportRegisteredStudentsForCourses($courses, $courseId, $ext);
+
+    }
+
     public function postHodManageFindCourses(Request $request)
     {
         $deptId = $request->get('department_id');
@@ -463,4 +478,11 @@ class BhuAdminController extends Controller
         return updateBiodataForStudents();
     }
 
+    public function getDemo()
+    {
+        $e = Crypt::encrypt('17819182731141');
+        $d = Crypt::decrypt('eyJpdiI6IklVRHJoTlwvWmo3OVFJbkJGXC9xVDc3dz09IiwidmFsdWUiOiJmXC83clJ4UG1GK1FiRTJCalpZUHl0eHF3QXhVVlBCSU1TTEYzY3pTUXRWOD0iLCJtYWMiOiIxOWViNmI3NWNmYmUwNmJmNTk4OWJjOTg1ODZlMDAxYTM4ZjFiOTFlOWY1ZTRkYzM1NmFlY2QzMjc2YzNjYTdkIn0');
+
+        return $d;
+    }
 }

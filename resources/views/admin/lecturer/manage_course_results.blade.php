@@ -15,7 +15,7 @@
                             <th class="text-center">Course Title</th>
                             <th class="text-center">Course Unit</th>
                             <th class="text-center">Semester</th>
-                            <th class="text-center">Manage Result</th>
+                            <th class="text-center">Manage</th>
                         </tr>
                         @if(count($courses) > 0)
                             @foreach($courses as $course)
@@ -30,13 +30,16 @@
                                         <a href="{{ route('admin.lecturer_manage_result',[encryptId($course->courses_course_id), encryptId($course->sessions_session_id), encryptId($semester)]) }}" data-toggle="tooltip" data-placement="top" title="Manage Results" alt="Manage Results">
                                             <span class="glyphicon glyphicon-list-alt"></span>
                                         </a>
+                                        <a href="{{ route('admin.download_registered_students',[encryptId($course->courses_course_id), encryptId($course->sessions_session_id), encryptId($semester)]) }}" data-toggle="tooltip" data-placement="top" title="Registered Students" alt="Registered Students">
+                                            <span class="glyphicon glyphicon-download-alt"></span>
+                                        </a>
                                     {{--@endif--}}
                                 </td>
                             </tr>
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="5"><p class="text-center">No course has been assigned to you.</p></td>
+                                <td colspan="5"><p class="text-center">No course(s) has been assigned to you.</p></td>
                             </tr>
                         @endif
                     </table>

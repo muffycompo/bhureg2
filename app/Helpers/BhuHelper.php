@@ -1170,7 +1170,7 @@ function getStudentCGPA($studentId){
             ->where('approval_status', 'Senate')
             ->get();
 
-    if(count($studentId) > 0){
+    if(count($studentResults) > 0){
         foreach ($studentResults as $studentResult) {
             $totalUnits = $totalUnits + (int) courseTitleAndUnits($studentResult->courses_course_id,true);
             $score = $studentResult->ca + $studentResult->exam;
@@ -1337,4 +1337,8 @@ function studentHasRegisteredForAnyCourse($studentId){
     return DB::connection('mysql2')->table('course_registration')
                 ->where('students_student_id', $studentId)
                 ->count(['courses_course_id']);
+}
+
+function roundNumberUp($number){
+    return round($number,0,PHP_ROUND_HALF_UP);
 }

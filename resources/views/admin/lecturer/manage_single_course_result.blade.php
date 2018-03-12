@@ -78,9 +78,9 @@
                                 <td nowrap="nowrap">{{ $course->students_student_id }}</td>
                                 <td nowrap="nowrap">{{ studentNameFromMatriculationNo($course->students_student_id) }}</td>
                                 @if(isCourseResultFinalized($course_id,$session_id,$semester_id))
-                                <td>{{ $course->exam }}</td>
+                                <td>{{ roundNumberUp($course->exam) }}</td>
                                 <td>
-                                    {{ $course->exam }}
+                                    {{ roundNumberUp($course->exam) }}
                                 </td>
                                 <td>
                                     {{ expandGrade($course->exam) }}
